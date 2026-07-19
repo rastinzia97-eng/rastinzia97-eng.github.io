@@ -46,7 +46,7 @@
         <div class="manager-tools" style="margin-top:14px">
           <div><label for="newFa">نام فارسی</label><input id="newFa" placeholder="مثلاً موکا"></div>
           <div><label for="newEn">نام انگلیسی</label><input id="newEn" placeholder="Mocha"></div>
-          <div><label for="newCat">دسته</label><select id="newCat"><option value="hot">نوشیدنی گرم</option><option value="cold">نوشیدنی سرد</option><option value="extra">افزودنی‌ها</option><option value="sweet">شیرینیات</option></select></div>
+          <div><label for="newCat">دسته</label><select id="newCat"><option value="hot">نوشیدنی گرم</option><option value="cold">نوشیدنی سرد</option><option value="fruit">کاسه میوه</option><option value="extra">افزودنی‌ها</option><option value="sweet">شیرینیات</option></select></div>
           <div><label class="shot-toggle"><input type="checkbox" id="newShots" checked> تک‌شات / دبل‌شات</label></div>
           <div><label for="newSingle">قیمت تک‌شات یا عادی</label><input id="newSingle" inputmode="numeric" placeholder="مثلاً 100000"></div>
           <div><label for="newDouble">قیمت دبل‌شات</label><input id="newDouble" inputmode="numeric" placeholder="مثلاً 130000"></div>
@@ -93,7 +93,7 @@ const PRODUCT_SEED=[
 {id:'bounty',fa:'بونتی (یک عدد)',en:'Bounty',cat:'sweet',price:18000,available:true,desc:'یک عدد بونتی.'},
 {id:'tiramisu',fa:'تیرامیسو (یک تکه ۵ در ۵)',en:'Tiramisu',cat:'sweet',price:50000,available:true,desc:'یک تکه تیرامیسو ۵ در ۵.'}
 ];
-const CATS={all:'همه',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد',extra:'افزودنی‌ها',sweet:'شیرینیات'},STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready:'آماده تحویل',delivered:'تحویل‌شده'},ORDER_AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
+const CATS={all:'همه',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد',fruit:'کاسه میوه',extra:'افزودنی‌ها',sweet:'شیرینیات'},STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready:'آماده تحویل',delivered:'تحویل‌شده'},ORDER_AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
 const CATALOG_VERSION=5;
 let products=load('raee_products',PRODUCT_SEED),orders=load('raee_orders',[]),cart={},menuCat='all',waiterCat='all',pollTimer=null,cloudBusy=false;
