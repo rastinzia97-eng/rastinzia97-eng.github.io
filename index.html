@@ -13,7 +13,7 @@
     .app{max-width:1240px;margin:auto;padding:16px 12px 70px}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;background:rgba(255,253,249,.94);backdrop-filter:blur(13px);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);margin-bottom:14px}
     .brand{display:flex;align-items:center;gap:11px}.logo{width:46px;height:46px;border:1.5px solid var(--accent);border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-weight:bold}.brand h1{font:700 20px Georgia,serif;letter-spacing:3px;margin:0}.brand small{display:block;color:var(--muted);margin-top:3px}.actions,.row-actions,.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .btn{border:0;border-radius:13px;padding:9px 13px;background:var(--accent);color:#fff;box-shadow:0 7px 16px rgba(123,82,61,.15)}.btn.secondary{background:var(--soft);color:var(--ink);box-shadow:none;border:1px solid var(--line)}.btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1px dashed var(--accent2)}.btn.success{background:var(--success)}.btn.warning{background:var(--warning)}.btn.danger{background:var(--danger)}.btn.info{background:var(--info)}.btn.small{padding:6px 9px;font-size:12px;border-radius:10px}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .nav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.nav button{border:1px solid var(--line);background:var(--paper);padding:11px;border-radius:14px;color:var(--ink);font-weight:bold}.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}.view{display:none}.view.active{display:block}
+    .nav{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}.nav button{border:1px solid var(--line);background:var(--paper);padding:11px;border-radius:14px;color:var(--ink);font-weight:bold}.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}.view{display:none}.view.active{display:block}
     .panel,.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.panel{padding:16px}.panel h3{margin:0 0 13px}.hero{text-align:center;padding:30px 18px;margin-bottom:14px}.hero h2{font:700 27px Georgia,serif;letter-spacing:5px;margin:6px}.hero p{color:var(--muted)}
     .layout-2{display:grid;grid-template-columns:1.5fr .85fr;gap:14px;align-items:start}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.form-grid.three{grid-template-columns:repeat(3,1fr)}label{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:0}input:focus,select:focus,textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(182,146,114,.15)}
     .chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:12px 0}.chip{border:1px solid var(--line);background:#fff;padding:7px 11px;border-radius:999px;color:var(--ink)}.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -24,12 +24,12 @@
     .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.lane{background:rgba(255,253,249,.7);border:1px dashed var(--line);border-radius:16px;padding:9px;min-height:210px}.lane h3{font-size:14px;margin:3px 4px 9px}
     .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:13px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:12px}.stat b{display:block;font-size:19px;margin-top:5px}
     .profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.profile-card{padding:13px}.profile-card h4{margin:0 0 4px}.profile-money{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.mini{padding:8px;background:#fbf6ef;border-radius:10px;font-size:12px}.mini b{display:block;margin-top:3px}
-    .detail{margin-top:13px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.transfer-order{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.transfer-order select{min-width:0}.hidden{display:none!important}
+    .detail{margin-top:13px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.reservation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.reservation-date-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.reservation-card{padding:13px}.reservation-card h4{margin:0 0 5px}.reservation-meta{line-height:1.9;color:var(--muted);font-size:13px}.reservation-slot{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:12px;margin-top:6px}select option:disabled{color:#999;background:#eee}.transfer-order{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.transfer-order select{min-width:0}.hidden{display:none!important}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{border-collapse:collapse;width:100%;min-width:850px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;vertical-align:top}th{background:#f5eadf;position:sticky;top:0}tr:last-child td{border-bottom:0}.manager-table input,.manager-table select{min-width:115px}.manager-table .wide-input{min-width:150px}.toggle{display:inline-flex;gap:6px;align-items:center}.toggle input{width:auto}.manager-tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;align-items:end}.manager-tools .wide{grid-column:span 2}.section-gap{margin-top:14px}.sync{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--muted)}.sync:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warning)}.sync.online:before{background:var(--success)}.sync.offline:before{background:var(--danger)}
     .toast{position:fixed;left:16px;bottom:16px;background:var(--ink);color:#fff;padding:11px 14px;border-radius:12px;opacity:0;transform:translateY(18px);pointer-events:none;transition:.25s;z-index:60;max-width:330px}.toast.show{opacity:1;transform:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
     .public-mode .staff-only,.public-mode .nav,.public-mode .actions{display:none!important}.public-mode .topbar{justify-content:center}.public-mode #view-menu{display:block!important}
     @media(max-width:950px){.layout-2{grid-template-columns:1fr}.kanban{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.manager-tools{grid-template-columns:repeat(2,1fr)}.manager-tools .wide{grid-column:1/-1}.grid,.profile-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:620px){.app{padding:9px 8px 60px}.topbar{padding:10px}.brand h1{font-size:17px;letter-spacing:2px}.logo{width:41px;height:41px}.nav{grid-template-columns:repeat(2,1fr)}.grid,.profile-grid,.product-picker,.form-grid,.form-grid.three,.manager-tools,.transfer-order{grid-template-columns:1fr}.manager-tools .wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.actions{gap:5px}.topbar .actions .btn{display:none}}
+    @media(max-width:620px){.app{padding:9px 8px 60px}.topbar{padding:10px}.brand h1{font-size:17px;letter-spacing:2px}.logo{width:41px;height:41px}.nav{grid-template-columns:repeat(2,1fr)}.grid,.profile-grid,.product-picker,.form-grid,.form-grid.three,.manager-tools,.transfer-order,.reservation-grid,.reservation-date-grid{grid-template-columns:1fr}.manager-tools .wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.actions{gap:5px}.topbar .actions .btn{display:none}}
   </style>
 </head>
 <body>
@@ -44,6 +44,7 @@
     <button data-view="waiter">ثبت سفارش</button>
     <button data-view="barista">باریستا</button>
     <button data-view="profiles">پروفایل‌ها</button>
+    <button data-view="reservations">رزرو / Reservation</button>
     <button data-view="manager">مدیریت</button>
   </nav>
 
@@ -107,6 +108,48 @@
       <div class="panel detail hidden" id="profileDetail"></div>
     </section>
 
+    <section id="view-reservations" class="view staff-only">
+      <div class="panel">
+        <div class="detail-head">
+          <div><h3 style="margin-bottom:3px">ثبت رزرو جدید</h3><span class="muted">همه فیلدها اختیاری‌اند. زمان‌های پرشده برای همان تاریخ و همان میز خاکستری و غیرفعال می‌شوند.</span></div>
+          <span class="badge" id="reservationCount">۰ رزرو</span>
+        </div>
+
+        <div class="form-grid section-gap">
+          <div><label for="reservationFirst">نام (اختیاری)</label><input id="reservationFirst" placeholder="مثلاً سارا"></div>
+          <div><label for="reservationLast">نام خانوادگی (اختیاری)</label><input id="reservationLast" placeholder="مثلاً تیموری"></div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label>تاریخ شمسی (اختیاری)</label>
+            <div class="reservation-date-grid">
+              <select id="reservationYear"><option value="">سال</option></select>
+              <select id="reservationMonth"><option value="">ماه</option></select>
+              <select id="reservationDay"><option value="">روز</option></select>
+            </div>
+          </div>
+          <div><label for="reservationTable">شماره میز (اختیاری)</label><select id="reservationTable"><option value="">انتخاب میز</option></select></div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="reservationTime">ساعت رزرو (اختیاری)</label>
+            <select id="reservationTime"><option value="">انتخاب ساعت</option></select>
+            <div class="muted" style="margin-top:6px">ساعت‌های رزرو‌شده برای میز و تاریخ انتخابی، خاکستری هستند.</div>
+          </div>
+          <div><label for="reservationPeople">تعداد نفرات (اختیاری)</label><select id="reservationPeople"><option value="">انتخاب تعداد</option></select></div>
+        </div>
+
+        <button class="btn" id="saveReservation">ثبت رزرو</button>
+      </div>
+
+      <div class="panel section-gap">
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">رزروهای ثبت‌شده</h3><span class="muted">با حذف رزرو، ساعت آن میز دوباره آزاد می‌شود.</span></div><button class="btn secondary small" id="refreshReservations">تازه‌سازی</button></div>
+        <div class="reservation-grid section-gap" id="reservationList"></div>
+      </div>
+    </section>
+
     <section id="view-manager" class="view staff-only">
       <div class="stats" id="stats"></div>
 
@@ -144,7 +187,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۲.۰ • پروفایل، بدهی و پرداخت</div>
+  <div class="footer">RAEE CAFE • نسخه ۲.۱ • سفارش، پروفایل، پرداخت و رزرو</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -189,21 +232,30 @@ const CATS={all:'همه',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد
 const STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready:'آماده تحویل',delivered:'تحویل‌شده'};
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=9;
+const APP_DATA_VERSION=10;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
 let profiles=loadLocal('raee_profiles',[]);
+let reservations=loadLocal('raee_reservations',[]);
 let cart={},menuCat='all',waiterCat='all',selectedProfileId=null,managerPaymentFilter='all',pollTimer=null,cloudBusy=false;
 let transferSelections={};
 
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function loadLocal(k,f){try{const v=JSON.parse(localStorage.getItem(k));return v??clone(f)}catch{return clone(f)}}
-function saveLocal(){localStorage.setItem('raee_products',JSON.stringify(products));localStorage.setItem('raee_orders',JSON.stringify(orders));localStorage.setItem('raee_profiles',JSON.stringify(profiles))}
+function saveLocal(){localStorage.setItem('raee_products',JSON.stringify(products));localStorage.setItem('raee_orders',JSON.stringify(orders));localStorage.setItem('raee_profiles',JSON.stringify(profiles));localStorage.setItem('raee_reservations',JSON.stringify(reservations))}
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 function money(v){return new Intl.NumberFormat('fa-IR').format(Number(v)||0)+' تومان'}
 function nowFa(ts=Date.now()){return new Intl.DateTimeFormat('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}
 function todayKey(ts=Date.now()){const d=new Date(ts);return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`}
+function faDigits(v){return String(v??'').replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}
+function pad2(v){return String(v).padStart(2,'0')}
+function jalaliLeap(y){return [1,5,9,13,17,22,26,30].includes(Number(y)%33)}
+function jalaliMonthDays(y,m){m=Number(m);if(m>=1&&m<=6)return 31;if(m>=7&&m<=11)return 30;if(m===12)return jalaliLeap(Number(y))?30:29;return 31}
+function reservationDateKey(y,m,d){return y&&m&&d?`${y}-${pad2(m)}-${pad2(d)}`:''}
+function reservationDateLabel(r){return r.dateKey?faDigits(r.dateKey.replaceAll('-','/')):'تاریخ مشخص نشده'}
+function reservationTimeLabel(v){return v?faDigits(v):'ساعت مشخص نشده'}
+
 function uid(prefix='R'){return prefix+Date.now().toString(36).slice(-7).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase()}
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2700)}
 function setSync(mode,text){const e=document.getElementById('syncState');e.className='sync '+mode;e.textContent=text}
@@ -231,6 +283,7 @@ async function loadCloud(silent=false){if(cloudBusy)return;cloudBusy=true;try{
   products=[...map.values()];
   orders=(data.orders?Object.values(data.orders).filter(Boolean):[]).map(migrateOrder).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   profiles=(data.profiles?Object.values(data.profiles).filter(Boolean):[]).sort((a,b)=>(a.number||0)-(b.number||0));
+  reservations=(data.reservations?Object.values(data.reservations).filter(Boolean):[]).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
   if(added||!data.products)await dbRequest('products','PUT',objById(products));
   if(Number(data.appDataVersion)!==APP_DATA_VERSION)await dbRequest('appDataVersion','PUT',APP_DATA_VERSION);
   saveLocal();renderAll();setSync('online','آنلاین و همگام');
@@ -277,6 +330,56 @@ window.transferOrder=async id=>{const o=orders.find(x=>x.id===id),profileSelect=
 
 window.markPaid=async id=>{const o=orders.find(x=>x.id===id);if(!o||paymentOf(o)==='paid')return;if(!confirm(`آیا مطمئن هستید سفارش ${orderProfileLabel(o)} به مبلغ ${money(totalOf(o))} پرداخت شده است؟`))return;const before={paymentStatus:o.paymentStatus,paidAt:o.paidAt};o.paymentStatus='paid';o.paidAt=Date.now();renderAll();try{await dbRequest('orders/'+id,'PATCH',{paymentStatus:'paid',paidAt:o.paidAt});toast('پرداخت ثبت شد؛ سفارش از پنل‌های فعال کنار رفت.')}catch{o.paymentStatus=before.paymentStatus;o.paidAt=before.paidAt;renderAll();toast('ثبت پرداخت ذخیره نشد.')}}
 
+
+const JALALI_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function reservationSortKey(r){return `${r.dateKey||'9999-99-99'} ${r.time||'99:99'} ${pad2(r.table||99)}`}
+function initReservationForm(){
+  const year=document.getElementById('reservationYear'),month=document.getElementById('reservationMonth'),table=document.getElementById('reservationTable'),people=document.getElementById('reservationPeople');
+  if(year.options.length===1)for(let y=1405;y<=1412;y++)year.insertAdjacentHTML('beforeend',`<option value="${y}">${faDigits(y)}</option>`);
+  if(month.options.length===1)JALALI_MONTHS.forEach((name,index)=>month.insertAdjacentHTML('beforeend',`<option value="${index+1}">${name}</option>`));
+  if(table.options.length===1)for(let n=1;n<=6;n++)table.insertAdjacentHTML('beforeend',`<option value="${n}">میز ${faDigits(n)}</option>`);
+  if(people.options.length===1)for(let n=1;n<=10;n++)people.insertAdjacentHTML('beforeend',`<option value="${n}">${faDigits(n)} نفر</option>`);
+  updateReservationDays();
+  updateReservationTimes(false);
+}
+function updateReservationDays(){
+  const y=document.getElementById('reservationYear').value,m=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay'),old=day.value,max=m?jalaliMonthDays(y||1405,m):31;
+  day.innerHTML='<option value="">روز</option>';
+  for(let d=1;d<=max;d++)day.insertAdjacentHTML('beforeend',`<option value="${d}">${faDigits(d)}</option>`);
+  if(old&&Number(old)<=max)day.value=old;
+  updateReservationTimes(true);
+}
+function occupiedReservation(dateKey,table,time){return Boolean(dateKey&&table&&time&&reservations.some(r=>r.dateKey===dateKey&&String(r.table)===String(table)&&r.time===time))}
+function updateReservationTimes(showToast=false){
+  const y=document.getElementById('reservationYear').value,m=document.getElementById('reservationMonth').value,d=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime'),dateKey=reservationDateKey(y,m,d),old=time.value;
+  time.innerHTML='<option value="">انتخاب ساعت</option>';
+  for(let minutes=11*60;minutes<=21*60;minutes+=30){const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`,busy=occupiedReservation(dateKey,table,value);time.insertAdjacentHTML('beforeend',`<option value="${value}" ${busy?'disabled':''}>${reservationTimeLabel(value)}${busy?' — رزرو شده':''}</option>`)}
+  const oldOption=[...time.options].find(o=>o.value===old);
+  if(oldOption&&!oldOption.disabled)time.value=old;
+  else if(old&&showToast)toast('این ساعت برای میز و تاریخ انتخابی رزرو شده است؛ ساعت دیگری را انتخاب کن.');
+}
+function clearReservationForm(){
+  ['reservationFirst','reservationLast'].forEach(id=>document.getElementById(id).value='');
+  ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationPeople'].forEach(id=>document.getElementById(id).value='');
+  updateReservationDays();
+  updateReservationTimes(false);
+}
+async function saveReservation(){
+  const firstName=document.getElementById('reservationFirst').value.trim(),lastName=document.getElementById('reservationLast').value.trim(),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
+  if(occupiedReservation(dateKey,table,time)){toast(`میز ${faDigits(table)} در ${reservationDateLabel({dateKey})} ساعت ${reservationTimeLabel(time)} قبلاً رزرو شده است.`);updateReservationTimes(false);return}
+  const r={id:uid('V'),firstName,lastName,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',people:people||'',table:table||'',createdAt:Date.now()};
+  btn.disabled=true;btn.textContent='در حال ثبت…';
+  try{await dbRequest('reservations/'+r.id,'PUT',r);reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));clearReservationForm();renderAll();toast('رزرو ثبت شد.')}catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
+}
+window.deleteReservation=async id=>{const r=reservations.find(x=>x.id===id);if(!r||!confirm(`رزرو ${reservationGuestLabel(r)} حذف شود؟`))return;try{await dbRequest('reservations/'+id,'DELETE');reservations=reservations.filter(x=>x.id!==id);renderAll();toast('رزرو حذف شد و ساعت میز دوباره آزاد شد.')}catch{toast('حذف رزرو انجام نشد.')}}
+function reservationGuestLabel(r){const name=`${r.firstName||''} ${r.lastName||''}`.trim();return name||'بدون نام'}
+function renderReservations(){
+  const count=document.getElementById('reservationCount'),list=document.getElementById('reservationList');
+  count.textContent=`${faDigits(reservations.length)} رزرو`;
+  list.innerHTML=reservations.map(r=>`<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • ${reservationTimeLabel(r.time)}<br>${r.table?`میز ${faDigits(r.table)}`:'میز مشخص نشده'} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`میز ${faDigits(r.table)} • ${reservationTimeLabel(r.time)}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px"><button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
+  updateReservationTimes(false);
+}
+
 function renderManager(){const today=orders.filter(o=>todayKey(o.createdAt)===todayKey()),debt=orders.filter(o=>paymentOf(o)==='unpaid').reduce((s,o)=>s+totalOf(o),0),paidToday=today.filter(o=>paymentOf(o)==='paid').reduce((s,o)=>s+totalOf(o),0);document.getElementById('stats').innerHTML=[['سفارش امروز',today.length],['پرداخت‌نشده',orders.filter(o=>paymentOf(o)==='unpaid').length],['مجموع بدهی',money(debt)],['فروش پرداخت‌شده امروز',money(paidToday)],['پروفایل‌ها',profiles.length]].map(([a,b])=>`<div class="stat"><span>${a}</span><b>${b}</b></div>`).join('');
  renderManagerOrders();renderProductsTable();renderCategorySelect()}
 function renderManagerOrders(){const filter=document.getElementById('paymentFilter').value,q=document.getElementById('managerOrderSearch').value.trim().toLowerCase();const list=orders.filter(o=>(filter==='all'||paymentOf(o)===filter)&&(!q||`${o.id} ${orderProfileLabel(o)} ${orderLocation(o)}`.toLowerCase().includes(q)));document.getElementById('ordersTable').innerHTML=list.map(o=>`<tr><td><b>${esc(o.id)}</b><div class="muted">${nowFa(o.createdAt)}</div></td><td>${esc(orderProfileLabel(o))}</td><td>${esc(orderLocation(o))}</td><td>${(o.items||[]).map(i=>`${i.qty}×${esc(i.name)}`).join('<br>')}</td><td><b>${money(totalOf(o))}</b></td><td><span class="status ${o.status}">${STATUS[o.status]||o.status}</span></td><td><span class="badge ${paymentOf(o)}">${paymentOf(o)==='paid'?'پرداخت‌شده':'پرداخت‌نشده'}</span></td><td><div class="row-actions">${paymentOf(o)==='unpaid'?`<button class="btn success small" onclick="markPaid('${o.id}')">پرداخت شد</button>`:''}<button class="btn danger small" onclick="deleteOrder('${o.id}')">حذف</button></div></td></tr>`).join('')||'<tr><td colspan="8" class="muted">سفارشی در این فیلتر نیست.</td></tr>'}
@@ -292,7 +395,7 @@ async function addProduct(){const fa=document.getElementById('newFa').value.trim
 function exportCSV(){const rows=[['کد سفارش','پروفایل','نام','نام خانوادگی','شماره تماس','نوع سفارش','میز','زمان','وضعیت سفارش','وضعیت پرداخت','محصولات','یادداشت','جمع']];for(const o of orders){const p=profileById(o.profileId);rows.push([o.id,orderProfileLabel(o),p?.firstName||o.profileFirstName||'',p?.lastName||o.profileLastName||'',p?.phone||o.profilePhone||'',AREAS[o.area]||'',o.table||'',nowFa(o.createdAt),STATUS[o.status]||o.status,paymentOf(o)==='paid'?'پرداخت‌شده':'پرداخت‌نشده',(o.items||[]).map(i=>`${i.qty}×${i.name}`).join(' | '),o.note||'',totalOf(o)])}const csv='\uFEFF'+rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='raee-orders.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 async function resetOrders(){if(!confirm('همه سفارش‌ها، حتی سابقه پرداخت‌شده، پاک شوند؟'))return;try{await dbRequest('orders','DELETE');orders=[];renderAll();toast('همه سفارش‌ها پاک شدند.')}catch{toast('پاک‌کردن سفارش‌ها انجام نشد.')}}
 
-function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderManager()}
+function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager()}
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));location.hash=name}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.getElementById('orderArea').addEventListener('change',updateArea);
@@ -302,6 +405,12 @@ document.getElementById('saveProfile').addEventListener('click',saveProfile);
 document.getElementById('cancelProfileEdit').addEventListener('click',clearProfileForm);
 document.getElementById('profileSearch').addEventListener('input',renderProfiles);
 document.getElementById('debtorsOnly').addEventListener('change',renderProfiles);
+document.getElementById('reservationYear').addEventListener('change',updateReservationDays);
+document.getElementById('reservationMonth').addEventListener('change',updateReservationDays);
+document.getElementById('reservationDay').addEventListener('change',()=>updateReservationTimes(true));
+document.getElementById('reservationTable').addEventListener('change',()=>updateReservationTimes(true));
+document.getElementById('saveReservation').addEventListener('click',saveReservation);
+document.getElementById('refreshReservations').addEventListener('click',async()=>{await loadCloud();toast('رزروها تازه شدند.')});
 document.getElementById('paymentFilter').addEventListener('change',renderManagerOrders);
 document.getElementById('managerOrderSearch').addEventListener('input',renderManagerOrders);
 document.getElementById('addProduct').addEventListener('click',addProduct);
@@ -313,9 +422,9 @@ document.getElementById('copyMenuLink').addEventListener('click',async()=>{const
 
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null});
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
-function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-menu').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','manager'].includes(name))showView(name)}}
+function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-menu').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
-updateArea();renderAll();applyHash();startRealtime();
+updateArea();initReservationForm();renderAll();applyHash();startRealtime();
 </script>
 </body>
 </html>
