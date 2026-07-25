@@ -24,7 +24,7 @@
     .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.lane{background:rgba(255,253,249,.7);border:1px dashed var(--line);border-radius:16px;padding:9px;min-height:210px}.lane h3{font-size:14px;margin:3px 4px 9px}
     .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:13px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:12px}.stat b{display:block;font-size:19px;margin-top:5px}
     .profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.profile-card{padding:13px}.profile-card h4{margin:0 0 4px}.profile-money{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.mini{padding:8px;background:#fbf6ef;border-radius:10px;font-size:12px}.mini b{display:block;margin-top:3px}
-    .detail{margin-top:13px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.reservation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.reservation-date-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.reservation-card{padding:13px}.reservation-card h4{margin:0 0 5px}.reservation-meta{line-height:1.9;color:var(--muted);font-size:13px}.reservation-slot{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:12px;margin-top:6px}select option:disabled{color:#999;background:#eee}.transfer-order{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.transfer-order select{min-width:0}.hidden{display:none!important}
+    .detail{margin-top:13px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.reservation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.reservation-date-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.reservation-card{padding:13px}.reservation-card h4{margin:0 0 5px}.reservation-meta{line-height:1.9;color:var(--muted);font-size:13px}.reservation-slot{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:12px;margin-top:6px}.reservation-reminder{display:none;margin-bottom:14px;padding:13px 15px;border:1px solid #d5a34b;border-radius:16px;background:#fff4d9;box-shadow:var(--shadow);color:#76511b}.reservation-reminder.show{display:block}.reservation-reminder-title{font-weight:800;margin-bottom:6px}.reservation-reminder-item{line-height:1.9}.reservation-reminder-item+.reservation-reminder-item{border-top:1px dashed rgba(118,81,27,.28);margin-top:7px;padding-top:7px}select option:disabled{color:#999;background:#eee}.transfer-order{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.transfer-order select{min-width:0}.hidden{display:none!important}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{border-collapse:collapse;width:100%;min-width:850px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;vertical-align:top}th{background:#f5eadf;position:sticky;top:0}tr:last-child td{border-bottom:0}.manager-table input,.manager-table select{min-width:115px}.manager-table .wide-input{min-width:150px}.toggle{display:inline-flex;gap:6px;align-items:center}.toggle input{width:auto}.manager-tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;align-items:end}.manager-tools .wide{grid-column:span 2}.section-gap{margin-top:14px}.sync{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--muted)}.sync:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warning)}.sync.online:before{background:var(--success)}.sync.offline:before{background:var(--danger)}
     .toast{position:fixed;left:16px;bottom:16px;background:var(--ink);color:#fff;padding:11px 14px;border-radius:12px;opacity:0;transform:translateY(18px);pointer-events:none;transition:.25s;z-index:60;max-width:330px}.toast.show{opacity:1;transform:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
     .public-mode .staff-only,.public-mode .nav,.public-mode .actions{display:none!important}.public-mode .topbar{justify-content:center}.public-mode #view-menu{display:block!important}
@@ -47,6 +47,11 @@
     <button data-view="reservations">رزرو / Reservation</button>
     <button data-view="manager">مدیریت</button>
   </nav>
+
+  <div class="reservation-reminder staff-only" id="reservationReminder">
+    <div class="reservation-reminder-title">🔔 یادآوری رزرو</div>
+    <div id="reservationReminderItems"></div>
+  </div>
 
   <main>
     <section id="view-menu" class="view active">
@@ -111,13 +116,12 @@
     <section id="view-reservations" class="view staff-only">
       <div class="panel">
         <div class="detail-head">
-          <div><h3 style="margin-bottom:3px">ثبت رزرو جدید</h3><span class="muted">همه فیلدها اختیاری‌اند. زمان‌های پرشده برای همان تاریخ و همان میز خاکستری و غیرفعال می‌شوند.</span></div>
+          <div><h3 style="margin-bottom:3px">ثبت رزرو جدید</h3><span class="muted">همه فیلدها اختیاری‌اند. زمان‌های پرشده برای همان تاریخ و همان میز خاکستری و غیرفعال می‌شوند. ساعت رزرو تا ۱۱ شب قابل انتخاب است.</span></div>
           <span class="badge" id="reservationCount">۰ رزرو</span>
         </div>
 
         <div class="form-grid section-gap">
-          <div><label for="reservationFirst">نام (اختیاری)</label><input id="reservationFirst" placeholder="مثلاً سارا"></div>
-          <div><label for="reservationLast">نام خانوادگی (اختیاری)</label><input id="reservationLast" placeholder="مثلاً تیموری"></div>
+          <div style="grid-column:1/-1"><label for="reservationLast">نام خانوادگی (اختیاری)</label><input id="reservationLast" placeholder="مثلاً تیموری"></div>
         </div>
 
         <div class="form-grid">
@@ -187,7 +191,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۲.۱ • سفارش، پروفایل، پرداخت و رزرو</div>
+  <div class="footer">RAEE CAFE • نسخه ۲.۲ • رزرو تا ۱۱ شب و یادآوری ۱۵ دقیقه‌ای</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -232,7 +236,7 @@ const CATS={all:'همه',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد
 const STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready:'آماده تحویل',delivered:'تحویل‌شده'};
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=10;
+const APP_DATA_VERSION=11;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
@@ -333,6 +337,36 @@ window.markPaid=async id=>{const o=orders.find(x=>x.id===id);if(!o||paymentOf(o)
 
 const JALALI_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
 function reservationSortKey(r){return `${r.dateKey||'9999-99-99'} ${r.time||'99:99'} ${pad2(r.table||99)}`}
+function currentPersianDateKey(){
+  try{
+    const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const part=type=>parts.find(x=>x.type===type)?.value||'';
+    return reservationDateKey(part('year'),part('month'),part('day'));
+  }catch{return''}
+}
+function timeToMinutes(value){if(!value||!value.includes(':'))return null;const [h,m]=value.split(':').map(Number);return Number.isFinite(h)&&Number.isFinite(m)?h*60+m:null}
+function renderReservationReminder(){
+  const banner=document.getElementById('reservationReminder'),box=document.getElementById('reservationReminderItems');
+  if(!banner||!box)return;
+  const now=new Date(),dateKey=currentPersianDateKey(),nowMinutes=now.getHours()*60+now.getMinutes();
+  const upcoming=reservations.map(r=>({r,minutesLeft:(timeToMinutes(r.time)??-9999)-nowMinutes}))
+    .filter(x=>x.r.dateKey===dateKey&&x.r.time&&x.minutesLeft>=0&&x.minutesLeft<=15)
+    .sort((a,b)=>a.minutesLeft-b.minutesLeft);
+  if(!upcoming.length){banner.classList.remove('show');box.innerHTML='';return}
+  box.innerHTML=upcoming.map(({r,minutesLeft})=>{
+    const remaining=minutesLeft===0?'زمان رزرو رسیده':`${faDigits(minutesLeft)} دقیقه مانده`;
+    const table=r.table?`میز ${faDigits(r.table)}`:'میز مشخص نشده';
+    const people=r.people?` • ${faDigits(r.people)} نفر`:'';
+    return `<div class="reservation-reminder-item"><b>${esc(reservationGuestLabel(r))}</b> • ${table} • ساعت ${reservationTimeLabel(r.time)}${people}<br><b>${remaining}</b> — برای تأیید رزرو تماس بگیرید.</div>`
+  }).join('');
+  banner.classList.add('show');
+}
+function startReservationReminder(){
+  renderReservationReminder();
+  if(window.__reservationReminderTimer)clearInterval(window.__reservationReminderTimer);
+  window.__reservationReminderTimer=setInterval(renderReservationReminder,30000);
+}
+
 function initReservationForm(){
   const year=document.getElementById('reservationYear'),month=document.getElementById('reservationMonth'),table=document.getElementById('reservationTable'),people=document.getElementById('reservationPeople');
   if(year.options.length===1)for(let y=1405;y<=1412;y++)year.insertAdjacentHTML('beforeend',`<option value="${y}">${faDigits(y)}</option>`);
@@ -353,26 +387,26 @@ function occupiedReservation(dateKey,table,time){return Boolean(dateKey&&table&&
 function updateReservationTimes(showToast=false){
   const y=document.getElementById('reservationYear').value,m=document.getElementById('reservationMonth').value,d=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime'),dateKey=reservationDateKey(y,m,d),old=time.value;
   time.innerHTML='<option value="">انتخاب ساعت</option>';
-  for(let minutes=11*60;minutes<=21*60;minutes+=30){const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`,busy=occupiedReservation(dateKey,table,value);time.insertAdjacentHTML('beforeend',`<option value="${value}" ${busy?'disabled':''}>${reservationTimeLabel(value)}${busy?' — رزرو شده':''}</option>`)}
+  for(let minutes=11*60;minutes<=23*60;minutes+=30){const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`,busy=occupiedReservation(dateKey,table,value);time.insertAdjacentHTML('beforeend',`<option value="${value}" ${busy?'disabled':''}>${reservationTimeLabel(value)}${busy?' — رزرو شده':''}</option>`)}
   const oldOption=[...time.options].find(o=>o.value===old);
   if(oldOption&&!oldOption.disabled)time.value=old;
   else if(old&&showToast)toast('این ساعت برای میز و تاریخ انتخابی رزرو شده است؛ ساعت دیگری را انتخاب کن.');
 }
 function clearReservationForm(){
-  ['reservationFirst','reservationLast'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('reservationLast').value='';
   ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationPeople'].forEach(id=>document.getElementById(id).value='');
   updateReservationDays();
   updateReservationTimes(false);
 }
 async function saveReservation(){
-  const firstName=document.getElementById('reservationFirst').value.trim(),lastName=document.getElementById('reservationLast').value.trim(),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
+  const lastName=document.getElementById('reservationLast').value.trim(),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
   if(occupiedReservation(dateKey,table,time)){toast(`میز ${faDigits(table)} در ${reservationDateLabel({dateKey})} ساعت ${reservationTimeLabel(time)} قبلاً رزرو شده است.`);updateReservationTimes(false);return}
-  const r={id:uid('V'),firstName,lastName,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',people:people||'',table:table||'',createdAt:Date.now()};
+  const r={id:uid('V'),lastName,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',people:people||'',table:table||'',createdAt:Date.now()};
   btn.disabled=true;btn.textContent='در حال ثبت…';
   try{await dbRequest('reservations/'+r.id,'PUT',r);reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));clearReservationForm();renderAll();toast('رزرو ثبت شد.')}catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
 }
 window.deleteReservation=async id=>{const r=reservations.find(x=>x.id===id);if(!r||!confirm(`رزرو ${reservationGuestLabel(r)} حذف شود؟`))return;try{await dbRequest('reservations/'+id,'DELETE');reservations=reservations.filter(x=>x.id!==id);renderAll();toast('رزرو حذف شد و ساعت میز دوباره آزاد شد.')}catch{toast('حذف رزرو انجام نشد.')}}
-function reservationGuestLabel(r){const name=`${r.firstName||''} ${r.lastName||''}`.trim();return name||'بدون نام'}
+function reservationGuestLabel(r){return r.lastName||r.firstName||'بدون نام خانوادگی'}
 function renderReservations(){
   const count=document.getElementById('reservationCount'),list=document.getElementById('reservationList');
   count.textContent=`${faDigits(reservations.length)} رزرو`;
@@ -395,7 +429,7 @@ async function addProduct(){const fa=document.getElementById('newFa').value.trim
 function exportCSV(){const rows=[['کد سفارش','پروفایل','نام','نام خانوادگی','شماره تماس','نوع سفارش','میز','زمان','وضعیت سفارش','وضعیت پرداخت','محصولات','یادداشت','جمع']];for(const o of orders){const p=profileById(o.profileId);rows.push([o.id,orderProfileLabel(o),p?.firstName||o.profileFirstName||'',p?.lastName||o.profileLastName||'',p?.phone||o.profilePhone||'',AREAS[o.area]||'',o.table||'',nowFa(o.createdAt),STATUS[o.status]||o.status,paymentOf(o)==='paid'?'پرداخت‌شده':'پرداخت‌نشده',(o.items||[]).map(i=>`${i.qty}×${i.name}`).join(' | '),o.note||'',totalOf(o)])}const csv='\uFEFF'+rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='raee-orders.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 async function resetOrders(){if(!confirm('همه سفارش‌ها، حتی سابقه پرداخت‌شده، پاک شوند؟'))return;try{await dbRequest('orders','DELETE');orders=[];renderAll();toast('همه سفارش‌ها پاک شدند.')}catch{toast('پاک‌کردن سفارش‌ها انجام نشد.')}}
 
-function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager()}
+function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder()}
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));location.hash=name}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.getElementById('orderArea').addEventListener('change',updateArea);
@@ -424,7 +458,7 @@ let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDe
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
 function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-menu').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
-updateArea();initReservationForm();renderAll();applyHash();startRealtime();
+updateArea();initReservationForm();renderAll();applyHash();startRealtime();startReservationReminder();
 </script>
 </body>
 </html>
