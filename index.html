@@ -197,7 +197,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۲.۵ • هشدار بدهی و پیامک تسویه</div>
+  <div class="footer">RAEE CAFE • نسخه ۲.۶ • میز ۶ VIP</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -245,7 +245,7 @@ const DEBT_CARD_NUMBER='6104338702256757';
 const DEBT_CARD_HOLDER='راستین حسینی ضیابری';
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=14;
+const APP_DATA_VERSION=15;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
@@ -268,6 +268,10 @@ function jalaliMonthDays(y,m){m=Number(m);if(m>=1&&m<=6)return 31;if(m>=7&&m<=11
 function reservationDateKey(y,m,d){return y&&m&&d?`${y}-${pad2(m)}-${pad2(d)}`:''}
 function reservationDateLabel(r){return r.dateKey?faDigits(r.dateKey.replaceAll('-','/')):'تاریخ مشخص نشده'}
 function reservationTimeLabel(v){return v?faDigits(v):'ساعت مشخص نشده'}
+function reservationTableLabel(value){
+  if(!value)return 'میز مشخص نشده';
+  return Number(value)===6?'میز ۶ — VIP':`میز ${faDigits(value)}`;
+}
 
 function uid(prefix='R'){return prefix+Date.now().toString(36).slice(-7).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase()}
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2700)}
@@ -407,7 +411,7 @@ function renderDebtReminder(){
 function reservationSmsText(r){
   const guest=r.lastName?`آقای / خانم ${r.lastName}`:'مشتری گرامی';
   const time=r.time?reservationTimeLabel(r.time):'زمان ثبت‌شده';
-  const table=r.table?`میز ${faDigits(r.table)}`:'میز ثبت‌شده';
+  const table=r.table?reservationTableLabel(r.table):'میز ثبت‌شده';
   return `سلام ${guest}، رزرو شما در RAEE CAFE برای ساعت ${time} و ${table} ثبت شده است. لطفاً در صورت حضور، تأیید بفرمایید.`;
 }
 window.sendReservationSms=id=>{
@@ -430,7 +434,7 @@ function renderReservationReminder(){
   if(!upcoming.length){banner.classList.remove('show');box.innerHTML='';return}
   box.innerHTML=upcoming.map(({r,minutesLeft})=>{
     const remaining=minutesLeft===0?'زمان رزرو رسیده':`${faDigits(minutesLeft)} دقیقه مانده`;
-    const table=r.table?`میز ${faDigits(r.table)}`:'میز مشخص نشده';
+    const table=reservationTableLabel(r.table);
     const people=r.people?` • ${faDigits(r.people)} نفر`:'';
     const phone=r.phone?` • ${esc(faDigits(r.phone))}`:'';
     const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک تأیید</button>`:`<span class="muted">شماره تماس ثبت نشده</span>`;
@@ -448,7 +452,7 @@ function initReservationForm(){
   const year=document.getElementById('reservationYear'),month=document.getElementById('reservationMonth'),table=document.getElementById('reservationTable'),people=document.getElementById('reservationPeople');
   if(year.options.length===1)for(let y=1405;y<=1412;y++)year.insertAdjacentHTML('beforeend',`<option value="${y}">${faDigits(y)}</option>`);
   if(month.options.length===1)JALALI_MONTHS.forEach((name,index)=>month.insertAdjacentHTML('beforeend',`<option value="${index+1}">${name}</option>`));
-  if(table.options.length===1)for(let n=1;n<=6;n++)table.insertAdjacentHTML('beforeend',`<option value="${n}">میز ${faDigits(n)}</option>`);
+  if(table.options.length===1)for(let n=1;n<=6;n++)table.insertAdjacentHTML('beforeend',`<option value="${n}">${reservationTableLabel(n)}</option>`);
   if(people.options.length===1)for(let n=1;n<=10;n++)people.insertAdjacentHTML('beforeend',`<option value="${n}">${faDigits(n)} نفر</option>`);
   updateReservationDays();
   updateReservationTimes(false);
@@ -479,7 +483,7 @@ function clearReservationForm(){
 async function saveReservation(){
   const lastName=document.getElementById('reservationLast').value.trim(),phoneInput=document.getElementById('reservationPhone'),phone=normalizePhone(phoneInput.value),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
   if(!validReservationPhone(phone)){toast('شماره تماس برای رزرو اجباری است؛ یک شماره معتبر وارد کن.');phoneInput.focus();return}
-  if(occupiedReservation(dateKey,table,time)){toast(`میز ${faDigits(table)} در ${reservationDateLabel({dateKey})} ساعت ${reservationTimeLabel(time)} قبلاً رزرو شده است.`);updateReservationTimes(false);return}
+  if(occupiedReservation(dateKey,table,time)){toast(`${reservationTableLabel(table)} در ${reservationDateLabel({dateKey})} ساعت ${reservationTimeLabel(time)} قبلاً رزرو شده است.`);updateReservationTimes(false);return}
   const r={id:uid('V'),lastName,phone,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',people:people||'',table:table||'',createdAt:Date.now()};
   btn.disabled=true;btn.textContent='در حال ثبت…';
   try{await dbRequest('reservations/'+r.id,'PUT',r);reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));clearReservationForm();renderAll();toast('رزرو ثبت شد.')}catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
@@ -489,7 +493,7 @@ function reservationGuestLabel(r){return r.lastName||r.firstName||'بدون نا
 function renderReservations(){
   const count=document.getElementById('reservationCount'),list=document.getElementById('reservationList');
   count.textContent=`${faDigits(reservations.length)} رزرو`;
-  list.innerHTML=reservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'';return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • ${reservationTimeLabel(r.time)}<br>${r.table?`میز ${faDigits(r.table)}`:'میز مشخص نشده'} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`میز ${faDigits(r.table)} • ${reservationTimeLabel(r.time)}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
+  list.innerHTML=reservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'';return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • ${reservationTimeLabel(r.time)}<br>${reservationTableLabel(r.table)} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`${reservationTableLabel(r.table)} • ${reservationTimeLabel(r.time)}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
   updateReservationTimes(false);
 }
 
