@@ -144,11 +144,17 @@
 
         <div class="form-grid">
           <div>
-            <label for="reservationTime">ساعت رزرو (اختیاری)</label>
-            <select id="reservationTime"><option value="">انتخاب ساعت</option></select>
-            <div class="muted" style="margin-top:6px">ساعت‌های رزرو‌شده برای میز و تاریخ انتخابی، خاکستری هستند.</div>
+            <label for="reservationTime">زمان شروع رزرو (اختیاری)</label>
+            <select id="reservationTime"><option value="">انتخاب زمان شروع</option></select>
           </div>
+          <div>
+            <label for="reservationEndTime">زمان پایان رزرو (اختیاری)</label>
+            <select id="reservationEndTime"><option value="">انتخاب زمان پایان</option></select>
+          </div>
+        </div>
+        <div class="form-grid">
           <div><label for="reservationPeople">تعداد نفرات (اختیاری)</label><select id="reservationPeople"><option value="">انتخاب تعداد</option></select></div>
+          <div class="muted" style="align-self:end;padding-bottom:10px">زمان‌ها هر ۱۵ دقیقه‌اند. بازه‌های دارای تداخل برای همان میز و تاریخ غیرفعال می‌شوند.</div>
         </div>
 
         <button class="btn" id="saveReservation">ثبت رزرو</button>
@@ -197,7 +203,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۲.۹ • حذف خودکار رزرو و پیامک همه بدهکاران</div>
+  <div class="footer">RAEE CAFE • نسخه ۳.۱ • زمان شروع و پایان رزرو</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -245,7 +251,7 @@ const DEBT_CARD_NUMBER='6104338702256757';
 const DEBT_CARD_HOLDER='راستین حسینی ضیابری';
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=18;
+const APP_DATA_VERSION=20;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
@@ -339,8 +345,8 @@ window.editProfile=id=>{const p=profileById(id);if(!p)return;document.getElement
 window.openProfile=id=>{selectedProfileId=id;renderProfileDetail();document.getElementById('profileDetail').scrollIntoView({behavior:'smooth',block:'start'})}
 window.deleteProfile=async id=>{const p=profileById(id);if(!p)return;const linked=orders.some(o=>o.profileId===id);if(linked){toast('این پروفایل سابقه سفارش دارد و حذف نمی‌شود؛ می‌توانی ویرایشش کنی.');return}if(!confirm(`${profileLabel(p)} حذف شود؟`))return;try{await dbRequest('profiles/'+id,'DELETE');profiles=profiles.filter(x=>x.id!==id);if(selectedProfileId===id)selectedProfileId=null;renderAll();toast('پروفایل حذف شد.')}catch{toast('حذف پروفایل انجام نشد.')}}
 function profileTotals(p){const list=orders.filter(o=>o.profileId===p.id),paid=list.filter(o=>paymentOf(o)==='paid').reduce((s,o)=>s+totalOf(o),0),debt=list.filter(o=>paymentOf(o)==='unpaid').reduce((s,o)=>s+totalOf(o),0);return{list,paid,debt,total:paid+debt}}
-function renderProfiles(){const q=document.getElementById('profileSearch').value.trim().toLowerCase(),debtors=document.getElementById('debtorsOnly').checked;const list=profiles.filter(p=>{const t=profileTotals(p);return(!q||`${p.number} ${p.firstName} ${p.lastName} ${p.phone}`.toLowerCase().includes(q))&&(!debtors||t.debt>0)});document.getElementById('profileGrid').innerHTML=list.map(p=>{const t=profileTotals(p),high=t.debt>=DEBT_ALERT_LIMIT,smsButton=t.debt>0?`<button class="btn danger small" onclick="sendDebtSms('${p.id}')">ارسال پیامک بدهی</button>`:'';return `<article class="card profile-card ${high?'debt-high':''}"><h4>${esc(profileLabel(p))}</h4><div>${esc(p.firstName)} ${esc(p.lastName)}</div><div class="muted">${esc(p.phone)}</div><div class="profile-money"><div class="mini">بدهی<b>${money(t.debt)}</b></div><div class="mini">کل خرید<b>${money(t.total)}</b></div></div>${high?'<span class="badge unpaid">سقف ۸۰۰ هزار تومان رد شده</span>':''}<div class="row-actions" style="margin-top:9px"><button class="btn info small" onclick="openProfile('${p.id}')">مشاهده حساب</button>${smsButton}<button class="btn secondary small" onclick="editProfile('${p.id}')">ویرایش</button><button class="btn danger small" onclick="deleteProfile('${p.id}')">حذف</button></div></article>`}).join('')||'<div class="cart-empty">پروفایلی پیدا نشد.</div>';renderProfileSelect();renderProfileDetail()}
-function renderProfileDetail(){const box=document.getElementById('profileDetail'),p=profileById(selectedProfileId);if(!p){box.classList.add('hidden');box.innerHTML='';return}const t=profileTotals(p),high=t.debt>=DEBT_ALERT_LIMIT,hasDebt=t.debt>0,smsButton=hasDebt?`<button class="btn danger small" onclick="sendDebtSms('${p.id}')">ارسال پیامک بدهی</button>`:'',settleButton=high?`<button class="btn success small" onclick="settleProfileDebt('${p.id}')">واریز شد؛ تسویه کامل</button>`:'';box.classList.remove('hidden');box.innerHTML=`<div class="detail-head"><div><h3 style="margin-bottom:4px">${esc(profileLabel(p))}</h3><div>${esc(p.firstName)} ${esc(p.lastName)} • ${esc(p.phone)}</div></div><div><span class="badge unpaid">بدهی: ${money(t.debt)}</span> <span class="badge paid">پرداخت‌شده: ${money(t.paid)}</span></div></div>${hasDebt&&!high?`<div class="order-card section-gap"><b>بدهی فعلی: ${money(t.debt)}</b><div class="row-actions" style="margin-top:9px">${smsButton}</div></div>`:''}${high?`<div class="order-card debt-high section-gap"><b>⚠️ بدهی این پروفایل از ۸۰۰ هزار تومان عبور کرده است.</b><div class="muted" style="margin-top:5px">مبلغ فعلی: ${money(t.debt)}</div><div class="row-actions" style="margin-top:9px">${smsButton}${settleButton}</div></div>`:''}<div class="order-list section-gap">${t.list.map(o=>profileOrderRow(o)).join('')||'<div class="cart-empty">هنوز سفارشی ندارد.</div>'}</div>`}
+function renderProfiles(){const q=document.getElementById('profileSearch').value.trim().toLowerCase(),debtors=document.getElementById('debtorsOnly').checked;const list=profiles.filter(p=>{const t=profileTotals(p);return(!q||`${p.number} ${p.firstName} ${p.lastName} ${p.phone}`.toLowerCase().includes(q))&&(!debtors||t.debt>0)});document.getElementById('profileGrid').innerHTML=list.map(p=>{const t=profileTotals(p),high=t.debt>=DEBT_ALERT_LIMIT,hasDebt=t.debt>0,smsButton=hasDebt?`<button class="btn danger small" onclick="sendDebtSms('${p.id}')">ارسال پیامک بدهی</button>`:'',settleButton=hasDebt?`<button class="btn success small" onclick="settleProfileDebt('${p.id}')">تسویه شد</button>`:'';return `<article class="card profile-card ${high?'debt-high':''}"><h4>${esc(profileLabel(p))}</h4><div>${esc(p.firstName)} ${esc(p.lastName)}</div><div class="muted">${esc(p.phone)}</div><div class="profile-money"><div class="mini">بدهی<b>${money(t.debt)}</b></div><div class="mini">کل خرید<b>${money(t.total)}</b></div></div>${high?'<span class="badge unpaid">سقف ۸۰۰ هزار تومان رد شده</span>':''}<div class="row-actions" style="margin-top:9px"><button class="btn info small" onclick="openProfile('${p.id}')">مشاهده حساب</button>${smsButton}${settleButton}<button class="btn secondary small" onclick="editProfile('${p.id}')">ویرایش</button><button class="btn danger small" onclick="deleteProfile('${p.id}')">حذف</button></div></article>`}).join('')||'<div class="cart-empty">پروفایلی پیدا نشد.</div>';renderProfileSelect();renderProfileDetail()}
+function renderProfileDetail(){const box=document.getElementById('profileDetail'),p=profileById(selectedProfileId);if(!p){box.classList.add('hidden');box.innerHTML='';return}const t=profileTotals(p),high=t.debt>=DEBT_ALERT_LIMIT,hasDebt=t.debt>0,smsButton=hasDebt?`<button class="btn danger small" onclick="sendDebtSms('${p.id}')">ارسال پیامک بدهی</button>`:'',settleButton=hasDebt?`<button class="btn success small" onclick="settleProfileDebt('${p.id}')">تسویه شد؛ پرداخت کامل</button>`:'';box.classList.remove('hidden');box.innerHTML=`<div class="detail-head"><div><h3 style="margin-bottom:4px">${esc(profileLabel(p))}</h3><div>${esc(p.firstName)} ${esc(p.lastName)} • ${esc(p.phone)}</div></div><div><span class="badge unpaid">بدهی: ${money(t.debt)}</span> <span class="badge paid">پرداخت‌شده: ${money(t.paid)}</span></div></div>${hasDebt&&!high?`<div class="order-card section-gap"><b>بدهی فعلی: ${money(t.debt)}</b><div class="row-actions" style="margin-top:9px">${smsButton}${settleButton}</div></div>`:''}${high?`<div class="order-card debt-high section-gap"><b>⚠️ بدهی این پروفایل از ۸۰۰ هزار تومان عبور کرده است.</b><div class="muted" style="margin-top:5px">مبلغ فعلی: ${money(t.debt)}</div><div class="row-actions" style="margin-top:9px">${smsButton}${settleButton}</div></div>`:''}<div class="order-list section-gap">${t.list.map(o=>profileOrderRow(o)).join('')||'<div class="cart-empty">هنوز سفارشی ندارد.</div>'}</div>`}
 window.rememberTransferSelection=(id,field,value)=>{if(!transferSelections[id])transferSelections[id]={profileId:'',itemChoice:''};transferSelections[id][field]=value}
 function profileOrderRow(o){const saved=transferSelections[o.id]||{profileId:'',itemChoice:''};const destinations=profiles.filter(p=>p.id!==o.profileId).map(p=>`<option value="${p.id}" ${saved.profileId===p.id?'selected':''}>${esc(profileLabel(p))} — ${esc(p.firstName)} ${esc(p.lastName)}</option>`).join('');const itemOptions=(o.items||[]).map((i,index)=>`<option value="${index}" ${saved.itemChoice===String(index)?'selected':''}>${esc(`${i.qty} × ${i.name}`)} — ${money((Number(i.price)||0)*(Number(i.qty)||0))}</option>`).join('');const transferBox=destinations?`<div class="transfer-order"><div><label for="transfer-${o.id}">پروفایل مقصد</label><select id="transfer-${o.id}" onchange="rememberTransferSelection('${o.id}','profileId',this.value)"><option value="">پروفایل مقصد را انتخاب کن</option>${destinations}</select></div><div><label for="transfer-item-${o.id}">کدام محصول منتقل شود؟</label><select id="transfer-item-${o.id}" onchange="rememberTransferSelection('${o.id}','itemChoice',this.value)"><option value="">محصول را انتخاب کن</option><option value="all" ${saved.itemChoice==='all'?'selected':''}>همه محصولات</option>${itemOptions}</select></div><button class="btn info small" onclick="transferOrder('${o.id}')">انتقال</button></div>`:`<div class="muted" style="margin-top:9px">برای انتقال سفارش باید حداقل یک پروفایل دیگر وجود داشته باشد.</div>`;return `<article class="order-card"><div class="order-head"><div><b>${esc(o.id)} • ${esc(orderLocation(o))}</b><div class="order-meta">${nowFa(o.createdAt)} • ${STATUS[o.status]||o.status}</div></div><span class="badge ${paymentOf(o)}">${paymentOf(o)==='paid'?'پرداخت‌شده':'پرداخت‌نشده'}</span></div><div class="order-items">${(o.items||[]).map(i=>`${i.qty} × ${esc(i.name)}`).join('<br>')}<div><b>جمع: ${money(totalOf(o))}</b></div></div><div class="row-actions">${paymentOf(o)==='unpaid'?`<button class="btn success small" onclick="markPaid('${o.id}')">ثبت پرداخت</button>`:''}</div>${transferBox}</article>`}
 
@@ -357,10 +363,10 @@ function reservationIsExpired(r){
   if(!today)return false;
   if(r.dateKey<today)return true;
   if(r.dateKey>today)return false;
-  const reservationMinutes=timeToMinutes(r.time);
-  if(reservationMinutes===null)return false;
+  const finishMinutes=timeToMinutes(r.endTime||r.time);
+  if(finishMinutes===null)return false;
   const now=new Date(),nowMinutes=now.getHours()*60+now.getMinutes();
-  return nowMinutes>reservationMinutes;
+  return nowMinutes>finishMinutes;
 }
 async function cleanupExpiredReservations(){
   if(window.__reservationCleanupBusy)return;
@@ -470,8 +476,10 @@ function renderDebtReminder(){
 function reservationSmsText(r){
   const guest=r.lastName?`آقای / خانم ${r.lastName}`:'مشتری گرامی';
   const time=r.time?reservationTimeLabel(r.time):'زمان ثبت‌شده';
+  const endTime=r.endTime?reservationTimeLabel(r.endTime):'';
+  const period=endTime?`از ساعت ${time} تا ${endTime}`:`برای ساعت ${time}`;
   const table=r.table?reservationTableLabel(r.table):'میز ثبت‌شده';
-  return `سلام ${guest}، رزرو شما در RAEE CAFE برای ساعت ${time} و ${table} ثبت شده است. لطفاً در صورت حضور، تأیید بفرمایید.`;
+  return `سلام ${guest}، رزرو شما در RAEE CAFE ${period} و ${table} ثبت شده است. لطفاً در صورت حضور، تأیید بفرمایید.`;
 }
 window.sendReservationSms=id=>{
   const r=reservations.find(x=>x.id===id);
@@ -497,7 +505,8 @@ function renderReservationReminder(){
     const people=r.people?` • ${faDigits(r.people)} نفر`:'';
     const phone=r.phone?` • ${esc(faDigits(r.phone))}`:'';
     const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک تأیید</button>`:`<span class="muted">شماره تماس ثبت نشده</span>`;
-    return `<div class="reservation-reminder-item"><b>${esc(reservationGuestLabel(r))}</b> • ${table} • ساعت ${reservationTimeLabel(r.time)}${people}${phone}<br><b>${remaining}</b> — تأیید حضور مشتری را بگیر.<div class="reservation-reminder-actions">${smsButton}</div></div>`
+    const period=r.endTime?`${reservationTimeLabel(r.time)} تا ${reservationTimeLabel(r.endTime)}`:reservationTimeLabel(r.time);
+    return `<div class="reservation-reminder-item"><b>${esc(reservationGuestLabel(r))}</b> • ${table} • ساعت ${period}${people}${phone}<br><b>${remaining}</b> — تأیید حضور مشتری را بگیر.<div class="reservation-reminder-actions">${smsButton}</div></div>`
   }).join('');
   banner.classList.add('show');
 }
@@ -523,36 +532,80 @@ function updateReservationDays(){
   if(old&&Number(old)<=max)day.value=old;
   updateReservationTimes(true);
 }
-function occupiedReservation(dateKey,table,time){return Boolean(dateKey&&table&&time&&reservations.some(r=>r.dateKey===dateKey&&String(r.table)===String(table)&&r.time===time))}
+function reservationInterval(r){
+  const start=timeToMinutes(r?.time),savedEnd=timeToMinutes(r?.endTime);
+  if(start===null)return null;
+  const end=savedEnd!==null?savedEnd:Math.min(start+15,23*60);
+  return{start,end:Math.max(end,start+1)};
+}
+function reservationIntervalsOverlap(dateKey,table,startTime,endTime,excludeId=''){
+  const start=timeToMinutes(startTime),end=timeToMinutes(endTime);
+  if(!dateKey||!table||start===null||end===null||end<=start)return false;
+  return reservations.some(r=>{
+    if(r.id===excludeId||r.dateKey!==dateKey||String(r.table)!==String(table))return false;
+    const range=reservationInterval(r);
+    return Boolean(range&&start<range.end&&range.start<end);
+  });
+}
+function reservationStartIsBusy(dateKey,table,startTime){
+  const point=timeToMinutes(startTime);
+  if(!dateKey||!table||point===null)return false;
+  return reservations.some(r=>{
+    if(r.dateKey!==dateKey||String(r.table)!==String(table))return false;
+    const range=reservationInterval(r);
+    return Boolean(range&&point>=range.start&&point<range.end);
+  });
+}
+function updateReservationEndTimes(showToast=false){
+  const y=document.getElementById('reservationYear').value,m=document.getElementById('reservationMonth').value,d=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,start=document.getElementById('reservationTime').value,endSelect=document.getElementById('reservationEndTime'),dateKey=reservationDateKey(y,m,d),old=endSelect.value,startMinutes=timeToMinutes(start);
+  endSelect.innerHTML='<option value="">انتخاب زمان پایان</option>';
+  for(let minutes=11*60;minutes<=23*60;minutes+=15){
+    const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`;
+    const beforeStart=startMinutes!==null&&minutes<=startMinutes;
+    const overlap=start&&reservationIntervalsOverlap(dateKey,table,start,value);
+    const disabled=!start||beforeStart||overlap;
+    const reason=overlap?' — تداخل دارد':'';
+    endSelect.insertAdjacentHTML('beforeend',`<option value="${value}" ${disabled?'disabled':''}>${reservationTimeLabel(value)}${reason}</option>`);
+  }
+  const oldOption=[...endSelect.options].find(o=>o.value===old);
+  if(oldOption&&!oldOption.disabled)endSelect.value=old;
+  else if(old&&showToast)toast('زمان پایان قبلی با زمان شروع یا یک رزرو دیگر تداخل دارد.');
+}
 function updateReservationTimes(showToast=false){
   const y=document.getElementById('reservationYear').value,m=document.getElementById('reservationMonth').value,d=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime'),dateKey=reservationDateKey(y,m,d),old=time.value;
-  time.innerHTML='<option value="">انتخاب ساعت</option>';
-  for(let minutes=11*60;minutes<=23*60;minutes+=30){const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`,busy=occupiedReservation(dateKey,table,value);time.insertAdjacentHTML('beforeend',`<option value="${value}" ${busy?'disabled':''}>${reservationTimeLabel(value)}${busy?' — رزرو شده':''}</option>`)}
+  time.innerHTML='<option value="">انتخاب زمان شروع</option>';
+  for(let minutes=11*60;minutes<23*60;minutes+=15){
+    const value=`${pad2(Math.floor(minutes/60))}:${pad2(minutes%60)}`,busy=reservationStartIsBusy(dateKey,table,value);
+    time.insertAdjacentHTML('beforeend',`<option value="${value}" ${busy?'disabled':''}>${reservationTimeLabel(value)}${busy?' — داخل بازه رزرو شده':''}</option>`);
+  }
   const oldOption=[...time.options].find(o=>o.value===old);
   if(oldOption&&!oldOption.disabled)time.value=old;
-  else if(old&&showToast)toast('این ساعت برای میز و تاریخ انتخابی رزرو شده است؛ ساعت دیگری را انتخاب کن.');
+  else if(old&&showToast)toast('زمان شروع قبلی داخل بازه یک رزرو دیگر است.');
+  updateReservationEndTimes(showToast);
 }
 function clearReservationForm(){
   document.getElementById('reservationLast').value='';
   document.getElementById('reservationPhone').value='';
-  ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationPeople'].forEach(id=>document.getElementById(id).value='');
+  ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationEndTime','reservationPeople'].forEach(id=>document.getElementById(id).value='');
   updateReservationDays();
   updateReservationTimes(false);
 }
 async function saveReservation(){
-  const lastName=document.getElementById('reservationLast').value.trim(),phoneInput=document.getElementById('reservationPhone'),phone=normalizePhone(phoneInput.value),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
+  const lastName=document.getElementById('reservationLast').value.trim(),phoneInput=document.getElementById('reservationPhone'),phone=normalizePhone(phoneInput.value),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,endTime=document.getElementById('reservationEndTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
   if(!validReservationPhone(phone)){toast('شماره تماس برای رزرو اجباری است؛ یک شماره معتبر وارد کن.');phoneInput.focus();return}
-  if(occupiedReservation(dateKey,table,time)){toast(`${reservationTableLabel(table)} در ${reservationDateLabel({dateKey})} ساعت ${reservationTimeLabel(time)} قبلاً رزرو شده است.`);updateReservationTimes(false);return}
-  const r={id:uid('V'),lastName,phone,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',people:people||'',table:table||'',createdAt:Date.now()};
+  if(Boolean(time)!==Boolean(endTime)){toast('زمان شروع و زمان پایان را هر دو انتخاب کن.');return}
+  if(time&&endTime&&timeToMinutes(endTime)<=timeToMinutes(time)){toast('زمان پایان باید بعد از زمان شروع باشد.');return}
+  if(reservationIntervalsOverlap(dateKey,table,time,endTime)){toast(`${reservationTableLabel(table)} در بازه ${reservationTimeLabel(time)} تا ${reservationTimeLabel(endTime)} با یک رزرو دیگر تداخل دارد.`);updateReservationTimes(false);return}
+  const r={id:uid('V'),lastName,phone,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',endTime:endTime||'',people:people||'',table:table||'',createdAt:Date.now()};
   btn.disabled=true;btn.textContent='در حال ثبت…';
   try{await dbRequest('reservations/'+r.id,'PUT',r);reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));clearReservationForm();renderAll();toast('رزرو ثبت شد.')}catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
 }
-window.deleteReservation=async id=>{const r=reservations.find(x=>x.id===id);if(!r||!confirm(`رزرو ${reservationGuestLabel(r)} حذف شود؟`))return;try{await dbRequest('reservations/'+id,'DELETE');reservations=reservations.filter(x=>x.id!==id);renderAll();toast('رزرو حذف شد و ساعت میز دوباره آزاد شد.')}catch{toast('حذف رزرو انجام نشد.')}}
+window.deleteReservation=async id=>{const r=reservations.find(x=>x.id===id);if(!r||!confirm(`رزرو ${reservationGuestLabel(r)} حذف شود؟`))return;try{await dbRequest('reservations/'+id,'DELETE');reservations=reservations.filter(x=>x.id!==id);renderAll();toast('رزرو حذف شد و بازه زمانی میز دوباره آزاد شد.')}catch{toast('حذف رزرو انجام نشد.')}}
 function reservationGuestLabel(r){return r.lastName||r.firstName||'بدون نام خانوادگی'}
 function renderReservations(){
   const count=document.getElementById('reservationCount'),list=document.getElementById('reservationList'),activeReservations=reservations.filter(r=>!reservationIsExpired(r));
   count.textContent=`${faDigits(activeReservations.length)} رزرو`;
-  list.innerHTML=activeReservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'';return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • ${reservationTimeLabel(r.time)}<br>${reservationTableLabel(r.table)} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`${reservationTableLabel(r.table)} • ${reservationTimeLabel(r.time)}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
+  list.innerHTML=activeReservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'',period=r.endTime?`${reservationTimeLabel(r.time)} تا ${reservationTimeLabel(r.endTime)}`:reservationTimeLabel(r.time);return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • شروع: ${reservationTimeLabel(r.time)} • پایان: ${r.endTime?reservationTimeLabel(r.endTime):'مشخص نشده'}<br>${reservationTableLabel(r.table)} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`${reservationTableLabel(r.table)} • ${period}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
   updateReservationTimes(false);
 }
 
@@ -585,6 +638,7 @@ document.getElementById('reservationYear').addEventListener('change',updateReser
 document.getElementById('reservationMonth').addEventListener('change',updateReservationDays);
 document.getElementById('reservationDay').addEventListener('change',()=>updateReservationTimes(true));
 document.getElementById('reservationTable').addEventListener('change',()=>updateReservationTimes(true));
+document.getElementById('reservationTime').addEventListener('change',()=>updateReservationEndTimes(true));
 document.getElementById('saveReservation').addEventListener('click',saveReservation);
 document.getElementById('refreshReservations').addEventListener('click',async()=>{await loadCloud();toast('رزروها تازه شدند.')});
 document.getElementById('paymentFilter').addEventListener('change',renderManagerOrders);
