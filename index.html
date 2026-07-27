@@ -142,6 +142,12 @@
           <div><label for="reservationTable">شماره میز (اختیاری)</label><select id="reservationTable"><option value="">انتخاب میز</option></select></div>
         </div>
 
+        <div id="reservationVipProfileBox" class="order-card hidden" style="margin-top:12px">
+          <label for="reservationVipProfile">پروفایل پرداخت‌کننده میز ۶ — VIP <span style="color:var(--danger)">*</span></label>
+          <select id="reservationVipProfile"><option value="">پروفایل مشتری را انتخاب کن</option></select>
+          <div class="muted" style="margin-top:7px">هزینه رزرو میز VIP برابر با ۲۰٬۰۰۰ تومان است و به بدهی همین پروفایل اضافه می‌شود.</div>
+        </div>
+
         <div class="form-grid">
           <div>
             <label for="reservationTime">زمان شروع رزرو (اختیاری)</label>
@@ -203,7 +209,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۳.۱ • زمان شروع و پایان رزرو</div>
+  <div class="footer">RAEE CAFE • نسخه ۳.۲ • هزینه رزرو میز VIP</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -249,9 +255,10 @@ const STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready
 const DEBT_ALERT_LIMIT=800000;
 const DEBT_CARD_NUMBER='6104338702256757';
 const DEBT_CARD_HOLDER='راستین حسینی ضیابری';
+const VIP_RESERVATION_FEE=20000;
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=20;
+const APP_DATA_VERSION=21;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
@@ -278,6 +285,26 @@ function reservationTableLabel(value){
   if(!value)return 'میز مشخص نشده';
   return Number(value)===6?'میز ۶ — VIP':`میز ${faDigits(value)}`;
 }
+function reservationProfileLabel(r){
+  const p=profileById(r?.profileId);
+  if(p)return profileLabel(p);
+  if(r?.profileNumber)return `پروفایل ${new Intl.NumberFormat('fa-IR').format(r.profileNumber)} (${r.profileLastName||r.profileFirstName||'بدون نام'})`;
+  return 'پروفایل مشخص نشده';
+}
+function updateReservationVipProfile(){
+  const isVip=Number(document.getElementById('reservationTable').value)===6;
+  const box=document.getElementById('reservationVipProfileBox'),select=document.getElementById('reservationVipProfile');
+  box.classList.toggle('hidden',!isVip);
+  if(!isVip)select.value='';
+}
+function syncReservationProfileContact(){
+  const p=profileById(document.getElementById('reservationVipProfile').value);
+  if(!p)return;
+  const last=document.getElementById('reservationLast'),phone=document.getElementById('reservationPhone');
+  if(!last.value.trim())last.value=p.lastName||p.firstName||'';
+  if(!phone.value.trim())phone.value=p.phone||'';
+}
+
 
 function uid(prefix='R'){return prefix+Date.now().toString(36).slice(-7).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase()}
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2700)}
@@ -323,7 +350,7 @@ function renderPicker(){renderFilters('waiterFilters',waiterCat,'setWaiterCat');
 window.changeQty=(key,d)=>{cart[key]=Math.max(0,(cart[key]||0)+d);if(!cart[key])delete cart[key];renderPicker();renderCart()}
 function renderCart(){const e=Object.entries(cart),box=document.getElementById('cartBox');if(!e.length){box.innerHTML='<div class="cart-empty">هنوز چیزی انتخاب نشده.</div>';return}let total=0;box.innerHTML=e.map(([key,q])=>{const i=cartItem(key);if(!i)return'';total+=(Number(i.price)||0)*q;return `<div class="cart-line"><span>${q} × ${esc(i.name)}</span><b>${money((Number(i.price)||0)*q)}</b></div>`}).join('')+`<div class="cart-total"><span>جمع سفارش</span><span>${money(total)}</span></div>`}
 
-function renderProfileSelect(){const el=document.getElementById('orderProfile'),current=el.value;const opts=profiles.map(p=>`<option value="${p.id}">${esc(profileLabel(p))} — ${esc(p.firstName)} ${esc(p.lastName)}${p.phone?' — '+esc(p.phone):''}</option>`).join('');el.innerHTML='<option value="">پروفایل مشتری را انتخاب کن</option>'+opts;if([...el.options].some(o=>o.value===current))el.value=current}
+function renderProfileSelect(){const opts=profiles.map(p=>`<option value="${p.id}">${esc(profileLabel(p))} — ${esc(p.firstName)} ${esc(p.lastName)}${p.phone?' — '+esc(p.phone):''}</option>`).join('');const el=document.getElementById('orderProfile'),current=el.value;el.innerHTML='<option value="">پروفایل مشتری را انتخاب کن</option>'+opts;if([...el.options].some(o=>o.value===current))el.value=current;const vip=document.getElementById('reservationVipProfile');if(vip){const vipCurrent=vip.value;vip.innerHTML='<option value="">پروفایل پرداخت‌کننده را انتخاب کن</option>'+opts;if([...vip.options].some(o=>o.value===vipCurrent))vip.value=vipCurrent}}
 function updateArea(){const area=document.getElementById('orderArea').value,t=document.getElementById('tableNo'),l=document.getElementById('tableLabel');if(area==='takeout'){t.value='';t.disabled=true;l.textContent='شماره میز (نیاز نیست)';t.placeholder='بیرون‌بر'}else{t.disabled=false;l.textContent='شماره میز';t.placeholder=area==='terrace'?'مثلاً ۲ تراس':'مثلاً ۵'}}
 async function submitOrder(){const p=profileById(document.getElementById('orderProfile').value),area=document.getElementById('orderArea').value,table=document.getElementById('tableNo').value.trim(),entries=Object.entries(cart),btn=document.getElementById('submitOrder');if(!p){toast('پروفایل مشتری را انتخاب کن.');return}if(area!=='takeout'&&!table){toast('شماره میز را وارد کن.');return}if(!entries.length){toast('حداقل یک محصول انتخاب کن.');return}
  const o={id:uid('R'),profileId:p.id,profileNumber:p.number,profileFirstName:p.firstName,profileLastName:p.lastName,profilePhone:p.phone||'',area,table:area==='takeout'?'':table,note:document.getElementById('orderNote').value.trim(),status:'new',paymentStatus:'unpaid',createdAt:Date.now(),items:entries.map(([key,qty])=>{const i=cartItem(key);return i?{id:i.p.id,variantId:i.v?.id||null,name:i.name,qty,price:Number(i.price)||0}:null}).filter(Boolean)};
@@ -479,7 +506,8 @@ function reservationSmsText(r){
   const endTime=r.endTime?reservationTimeLabel(r.endTime):'';
   const period=endTime?`از ساعت ${time} تا ${endTime}`:`برای ساعت ${time}`;
   const table=r.table?reservationTableLabel(r.table):'میز ثبت‌شده';
-  return `سلام ${guest}، رزرو شما در RAEE CAFE ${period} و ${table} ثبت شده است. لطفاً در صورت حضور، تأیید بفرمایید.`;
+  const feeText=Number(r.table)===6?` هزینه رزرو میز VIP به مبلغ ${money(VIP_RESERVATION_FEE)} در ${reservationProfileLabel(r)} ثبت شده است.`:'';
+  return `سلام ${guest}، رزرو شما در RAEE CAFE ${period} و ${table} ثبت شده است.${feeText} لطفاً در صورت حضور، تأیید بفرمایید.`;
 }
 window.sendReservationSms=id=>{
   const r=reservations.find(x=>x.id===id);
@@ -586,26 +614,40 @@ function updateReservationTimes(showToast=false){
 function clearReservationForm(){
   document.getElementById('reservationLast').value='';
   document.getElementById('reservationPhone').value='';
-  ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationEndTime','reservationPeople'].forEach(id=>document.getElementById(id).value='');
+  ['reservationYear','reservationMonth','reservationDay','reservationTable','reservationTime','reservationEndTime','reservationPeople','reservationVipProfile'].forEach(id=>document.getElementById(id).value='');
+  updateReservationVipProfile();
   updateReservationDays();
   updateReservationTimes(false);
 }
 async function saveReservation(){
-  const lastName=document.getElementById('reservationLast').value.trim(),phoneInput=document.getElementById('reservationPhone'),phone=normalizePhone(phoneInput.value),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,endTime=document.getElementById('reservationEndTime').value,people=document.getElementById('reservationPeople').value,dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation');
+  const lastName=document.getElementById('reservationLast').value.trim(),phoneInput=document.getElementById('reservationPhone'),phone=normalizePhone(phoneInput.value),year=document.getElementById('reservationYear').value,month=document.getElementById('reservationMonth').value,day=document.getElementById('reservationDay').value,table=document.getElementById('reservationTable').value,time=document.getElementById('reservationTime').value,endTime=document.getElementById('reservationEndTime').value,people=document.getElementById('reservationPeople').value,vipProfileId=document.getElementById('reservationVipProfile').value,vipProfile=profileById(vipProfileId),dateKey=reservationDateKey(year,month,day),btn=document.getElementById('saveReservation'),isVip=Number(table)===6;
   if(!validReservationPhone(phone)){toast('شماره تماس برای رزرو اجباری است؛ یک شماره معتبر وارد کن.');phoneInput.focus();return}
+  if(isVip&&!vipProfile){toast('برای رزرو میز ۶ — VIP باید پروفایل پرداخت‌کننده را انتخاب کنی.');document.getElementById('reservationVipProfile').focus();return}
   if(Boolean(time)!==Boolean(endTime)){toast('زمان شروع و زمان پایان را هر دو انتخاب کن.');return}
   if(time&&endTime&&timeToMinutes(endTime)<=timeToMinutes(time)){toast('زمان پایان باید بعد از زمان شروع باشد.');return}
   if(reservationIntervalsOverlap(dateKey,table,time,endTime)){toast(`${reservationTableLabel(table)} در بازه ${reservationTimeLabel(time)} تا ${reservationTimeLabel(endTime)} با یک رزرو دیگر تداخل دارد.`);updateReservationTimes(false);return}
-  const r={id:uid('V'),lastName,phone,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',endTime:endTime||'',people:people||'',table:table||'',createdAt:Date.now()};
+  const createdAt=Date.now(),r={id:uid('V'),lastName,phone,dateYear:year||'',dateMonth:month||'',dateDay:day||'',dateKey,time:time||'',endTime:endTime||'',people:people||'',table:table||'',createdAt};
+  let feeOrder=null;
+  if(isVip){
+    feeOrder={id:uid('F'),profileId:vipProfile.id,profileNumber:vipProfile.number,profileFirstName:vipProfile.firstName,profileLastName:vipProfile.lastName,profilePhone:vipProfile.phone||'',area:'hall',table:'6',note:`هزینه رزرو ${reservationDateLabel(r)} از ${reservationTimeLabel(time)} تا ${reservationTimeLabel(endTime)}`,status:'delivered',paymentStatus:'unpaid',createdAt,orderType:'reservation_fee',reservationId:r.id,items:[{id:'vip-reservation-fee',variantId:null,name:'هزینه رزرو میز ۶ — VIP',qty:1,price:VIP_RESERVATION_FEE}]};
+    Object.assign(r,{profileId:vipProfile.id,profileNumber:vipProfile.number,profileFirstName:vipProfile.firstName,profileLastName:vipProfile.lastName,profilePhone:vipProfile.phone||'',feeOrderId:feeOrder.id,reservationFee:VIP_RESERVATION_FEE});
+  }
   btn.disabled=true;btn.textContent='در حال ثبت…';
-  try{await dbRequest('reservations/'+r.id,'PUT',r);reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));clearReservationForm();renderAll();toast('رزرو ثبت شد.')}catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
+  try{
+    const updates={};updates[`reservations/${r.id}`]=r;if(feeOrder)updates[`orders/${feeOrder.id}`]=feeOrder;
+    await dbRequest('','PATCH',updates);
+    reservations.push(r);reservations.sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+    if(feeOrder)orders.unshift(feeOrder);
+    clearReservationForm();renderAll();
+    toast(feeOrder?`رزرو ثبت شد و ${money(VIP_RESERVATION_FEE)} به ${profileLabel(vipProfile)} اضافه شد.`:'رزرو ثبت شد.');
+  }catch{toast('رزرو ذخیره نشد؛ اتصال را بررسی کن.')}finally{btn.disabled=false;btn.textContent='ثبت رزرو'}
 }
 window.deleteReservation=async id=>{const r=reservations.find(x=>x.id===id);if(!r||!confirm(`رزرو ${reservationGuestLabel(r)} حذف شود؟`))return;try{await dbRequest('reservations/'+id,'DELETE');reservations=reservations.filter(x=>x.id!==id);renderAll();toast('رزرو حذف شد و بازه زمانی میز دوباره آزاد شد.')}catch{toast('حذف رزرو انجام نشد.')}}
 function reservationGuestLabel(r){return r.lastName||r.firstName||'بدون نام خانوادگی'}
 function renderReservations(){
   const count=document.getElementById('reservationCount'),list=document.getElementById('reservationList'),activeReservations=reservations.filter(r=>!reservationIsExpired(r));
   count.textContent=`${faDigits(activeReservations.length)} رزرو`;
-  list.innerHTML=activeReservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'',period=r.endTime?`${reservationTimeLabel(r.time)} تا ${reservationTimeLabel(r.endTime)}`:reservationTimeLabel(r.time);return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • شروع: ${reservationTimeLabel(r.time)} • پایان: ${r.endTime?reservationTimeLabel(r.endTime):'مشخص نشده'}<br>${reservationTableLabel(r.table)} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}</div></div><span class="reservation-slot">${r.table&&r.time?`${reservationTableLabel(r.table)} • ${period}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
+  list.innerHTML=activeReservations.map(r=>{const smsButton=validReservationPhone(r.phone)?`<button class="btn info small" onclick="sendReservationSms('${r.id}')">ارسال پیامک</button>`:'',period=r.endTime?`${reservationTimeLabel(r.time)} تا ${reservationTimeLabel(r.endTime)}`:reservationTimeLabel(r.time),vipInfo=Number(r.table)===6?`<br><b>هزینه رزرو: ${money(r.reservationFee||VIP_RESERVATION_FEE)}</b> • ${esc(reservationProfileLabel(r))}`:'';return `<article class="card reservation-card"><div class="detail-head"><div><h4>${esc(reservationGuestLabel(r))}</h4><div class="reservation-meta">${reservationDateLabel(r)} • شروع: ${reservationTimeLabel(r.time)} • پایان: ${r.endTime?reservationTimeLabel(r.endTime):'مشخص نشده'}<br>${reservationTableLabel(r.table)} • ${r.people?`${faDigits(r.people)} نفر`:'تعداد نفر مشخص نشده'}<br>${r.phone?`شماره تماس: ${esc(faDigits(r.phone))}`:'شماره تماس ثبت نشده'}${vipInfo}</div></div><span class="reservation-slot">${r.table&&r.time?`${reservationTableLabel(r.table)} • ${period}`:'رزرو ناقص'}</span></div><div class="row-actions" style="margin-top:10px">${smsButton}<button class="btn danger small" onclick="deleteReservation('${r.id}')">حذف رزرو</button></div></article>`}).join('')||'<div class="cart-empty">هنوز رزروی ثبت نشده است.</div>';
   updateReservationTimes(false);
 }
 
@@ -637,8 +679,9 @@ document.getElementById('debtorsOnly').addEventListener('change',renderProfiles)
 document.getElementById('reservationYear').addEventListener('change',updateReservationDays);
 document.getElementById('reservationMonth').addEventListener('change',updateReservationDays);
 document.getElementById('reservationDay').addEventListener('change',()=>updateReservationTimes(true));
-document.getElementById('reservationTable').addEventListener('change',()=>updateReservationTimes(true));
+document.getElementById('reservationTable').addEventListener('change',()=>{updateReservationVipProfile();updateReservationTimes(true)});
 document.getElementById('reservationTime').addEventListener('change',()=>updateReservationEndTimes(true));
+document.getElementById('reservationVipProfile').addEventListener('change',syncReservationProfileContact);
 document.getElementById('saveReservation').addEventListener('click',saveReservation);
 document.getElementById('refreshReservations').addEventListener('click',async()=>{await loadCloud();toast('رزروها تازه شدند.')});
 document.getElementById('paymentFilter').addEventListener('change',renderManagerOrders);
@@ -654,7 +697,7 @@ let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDe
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
 function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-menu').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
-updateArea();initReservationForm();renderAll();applyHash();startRealtime();startReservationReminder();startExpiredReservationCleanup();
+updateArea();initReservationForm();updateReservationVipProfile();renderAll();applyHash();startRealtime();startReservationReminder();startExpiredReservationCleanup();
 </script>
 </body>
 </html>
