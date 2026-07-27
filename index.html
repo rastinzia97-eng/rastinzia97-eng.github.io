@@ -190,7 +190,7 @@
       </div>
 
       <div class="panel section-gap">
-        <div class="detail-head"><div><h3 style="margin-bottom:3px">افزودن محصول جدید</h3><span class="muted">محصولات کاسه میوه، چای و ایونت هم در منوی مشتری نمایش داده می‌شوند.</span></div></div>
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">افزودن محصول جدید</h3><span class="muted">محصولات صبحانه، آبمیوه طبیعی، کاسه میوه، چای و ایونت هم در منوی مشتری نمایش داده می‌شوند.</span></div></div>
         <div class="manager-tools section-gap">
           <div><label for="newFa">نام فارسی</label><input id="newFa" placeholder="نام محصول"></div>
           <div><label for="newEn">نام انگلیسی</label><input id="newEn" placeholder="اختیاری"></div>
@@ -209,12 +209,24 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۳.۴ • اصلاح حذف خودکار رزرو</div>
+  <div class="footer">RAEE CAFE • نسخه ۳.۵ • محصولات صبحانه</div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 const PRODUCT_SEED=[
+{id:'breakfast-fried-egg-bacon-toast',fa:'تست نیمرو بیکن',en:'Fried Egg Bacon Toast',cat:'breakfast',price:575000,available:true,desc:'تست خمیر ترش، نیمرو، دیپ پیازچه و بیکن کورن‌بیف.'},
+{id:'breakfast-pomodoro-toast',fa:'تست پومودورو',en:'Pomodoro Toast',cat:'breakfast',price:495000,available:true,desc:'تست خمیر ترش، تخم‌مرغ همزده، دیپ پنیر، نخود و پوره گوجه.'},
+{id:'breakfast-egg-chicken-toast',fa:'تست اگ چیکن',en:'Egg Chicken Toast',cat:'breakfast',price:585000,available:true,desc:'تست خمیر ترش، سفیده تخم‌مرغ، مرغ، قارچ و کرم زرده.'},
+{id:'breakfast-scrambled-egg-turkey-toast',fa:'تست اسکرامبل بوقلمون',en:'Scrambled Egg Turkey Toast',cat:'breakfast',price:635000,available:true,desc:'تست خمیر ترش، تخم‌مرغ همزده، سینه بوقلمون، دیپ پرتقال و سبزیجات.'},
+{id:'breakfast-scrambled-egg-toast',fa:'تست اسکرامبل',en:'Scrambled Egg Toast',cat:'breakfast',price:435000,available:true,desc:'تست خمیر ترش، دیپ ریحان، پسته، روکولا و تخم‌مرغ همزده.'},
+{id:'breakfast-scrambled-egg-cheese-toast',fa:'تست اسکرامبل چیز',en:'Scrambled Egg Cheese Toast',cat:'breakfast',price:495000,available:true,desc:'تست خمیر ترش، تخم‌مرغ همزده، پنیر مزه‌دارشده، سبزیجات بخارپز، بیبی اسفناج و گردو.'},
+{id:'breakfast-pistachio-scrambled-egg-toast',fa:'تست اسکرامبل پسته',en:'Pistachio Scrambled Egg Toast',cat:'breakfast',price:590000,available:true,desc:'تست خمیر ترش، تخم‌مرغ همزده، بیکن و دیپ ریحان و پسته.'},
+{id:'breakfast-fried-egg-toast',fa:'تست نیمرو',en:'Fried Egg Toast',cat:'breakfast',price:435000,available:true,desc:'تست خمیر ترش، دیپ ریحان، پسته، روکولا و نیمرو.'},
+{id:'breakfast-walnut-cheese-croissant',fa:'کروسان پنیر گردو',en:'Walnut & Cheese Croissant',cat:'breakfast',price:295000,available:true,desc:'کروسان، پنیر مزه‌دارشده، گردو و ریحان.'},
+{id:'breakfast-cheese-cucumber-toast',fa:'تست پنیر خیار',en:'Cheese & Cucumber Toast',cat:'breakfast',price:295000,available:true,desc:'تست خمیر ترش، پنیر مزه‌دارشده، خیار و گوجه.'},
+{id:'breakfast-bruschetta',fa:'بروسکتا',en:'Bruschetta',cat:'breakfast',price:390000,available:true,desc:'تست خمیر ترش، موزارلای تازه، گوجه، ریحان، روغن پاپریکا و فلفل.'},
+{id:'breakfast-peanut-butter-toast',fa:'تست کره بادام زمینی',en:'Peanut Butter Toast',cat:'breakfast',price:385000,available:true,desc:'تست خمیر ترش، کره بادام زمینی، توت‌فرنگی و شکلات.'},
 {id:'espresso',fa:'اسپرسو',en:'Espresso',cat:'hot',available:true,desc:'شات کوتاه و پرعطر قهوه با کرمای طلایی.',variants:[{id:'single',label:'تک‌شات',price:50000},{id:'double',label:'دبل‌شات',price:80000}]},
 {id:'coffee',fa:'قهوه',en:'Coffee',cat:'hot',available:true,desc:'قهوه کلاسیک و خوش‌نوش.',variants:[{id:'single',label:'تک‌شات',price:85000},{id:'double',label:'دبل‌شات',price:115000}]},
 {id:'americano',fa:'آمریکانو',en:'Americano',cat:'hot',available:true,desc:'اسپرسو و آب داغ؛ سبک و خوش‌عطر.',variants:[{id:'single',label:'تک‌شات',price:100000},{id:'double',label:'دبل‌شات',price:130000}]},
@@ -258,7 +270,7 @@ const DEBT_CARD_HOLDER='راستین حسینی ضیابری';
 const VIP_RESERVATION_FEE=20000;
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=23;
+const APP_DATA_VERSION=24;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
