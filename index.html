@@ -209,7 +209,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">RAEE CAFE • نسخه ۳.۲ • هزینه رزرو میز VIP</div>
+  <div class="footer">RAEE CAFE • نسخه ۳.۴ • اصلاح حذف خودکار رزرو</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -250,7 +250,7 @@ const PRODUCT_SEED=[
 {id:'event-fruit',fa:'ایونت میوه',en:'Fruit Event',cat:'event',price:50000,available:true,desc:'ورودی ایونت میوه.'}
 ];
 
-const CATS={all:'همه',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد',tea:'چای',fruit:'کاسه میوه',event:'ایونت‌ها',extra:'افزودنی‌ها',sweet:'شیرینیات'};
+const CATS={all:'همه',breakfast:'صبحانه',juice:'آبمیوه‌های طبیعی',hot:'نوشیدنی گرم',cold:'نوشیدنی سرد',tea:'چای',fruit:'کاسه میوه',event:'ایونت‌ها',extra:'افزودنی‌ها',sweet:'شیرینیات'};
 const STATUS={new:'جدید',preparing:'در حال آماده‌سازی',ready:'آماده تحویل',delivered:'تحویل‌شده'};
 const DEBT_ALERT_LIMIT=800000;
 const DEBT_CARD_NUMBER='6104338702256757';
@@ -258,7 +258,7 @@ const DEBT_CARD_HOLDER='راستین حسینی ضیابری';
 const VIP_RESERVATION_FEE=20000;
 const AREAS={hall:'داخل سالن',terrace:'تراس',takeout:'بیرون‌بر'};
 const FIREBASE_DB_URL='https://raee-cafe-default-rtdb.europe-west1.firebasedatabase.app';
-const APP_DATA_VERSION=21;
+const APP_DATA_VERSION=23;
 
 let products=loadLocal('raee_products',PRODUCT_SEED);
 let orders=loadLocal('raee_orders',[]);
@@ -386,14 +386,13 @@ const JALALI_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','
 function reservationSortKey(r){return `${r.dateKey||'9999-99-99'} ${r.time||'99:99'} ${pad2(r.table||99)}`}
 function reservationIsExpired(r){
   if(!r?.dateKey||!r?.time)return false;
-  const today=currentPersianDateKey();
+  const clock=currentTehranClock(),today=clock.dateKey;
   if(!today)return false;
   if(r.dateKey<today)return true;
   if(r.dateKey>today)return false;
   const finishMinutes=timeToMinutes(r.endTime||r.time);
   if(finishMinutes===null)return false;
-  const now=new Date(),nowMinutes=now.getHours()*60+now.getMinutes();
-  return nowMinutes>finishMinutes;
+  return clock.minutes>=finishMinutes;
 }
 async function cleanupExpiredReservations(){
   if(window.__reservationCleanupBusy)return;
@@ -410,6 +409,7 @@ async function cleanupExpiredReservations(){
     renderReservations();
     renderReservationReminder();
   }catch{
+    setSync('offline','حذف رزروهای گذشته انجام نشد');
   }finally{
     window.__reservationCleanupBusy=false;
   }
@@ -420,13 +420,27 @@ function startExpiredReservationCleanup(){
   window.__expiredReservationTimer=setInterval(cleanupExpiredReservations,30000);
 }
 
-function currentPersianDateKey(){
+function currentTehranClock(){
   try{
-    const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{
+      timeZone:'Asia/Tehran',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'2-digit',
+      minute:'2-digit',
+      hourCycle:'h23'
+    }).formatToParts(new Date());
     const part=type=>parts.find(x=>x.type===type)?.value||'';
-    return reservationDateKey(part('year'),part('month'),part('day'));
-  }catch{return''}
+    const hour=Number(part('hour')),minute=Number(part('minute'));
+    return{
+      dateKey:reservationDateKey(part('year'),part('month'),part('day')),
+      minutes:Number.isFinite(hour)&&Number.isFinite(minute)?hour*60+minute:0
+    };
+  }catch{return{dateKey:'',minutes:0}}
 }
+function currentPersianDateKey(){return currentTehranClock().dateKey}
+function currentTehranMinutes(){return currentTehranClock().minutes}
 function timeToMinutes(value){if(!value||!value.includes(':'))return null;const [h,m]=value.split(':').map(Number);return Number.isFinite(h)&&Number.isFinite(m)?h*60+m:null}
 function normalizePhone(value){
   return String(value||'').trim()
@@ -522,7 +536,7 @@ window.sendReservationSms=id=>{
 function renderReservationReminder(){
   const banner=document.getElementById('reservationReminder'),box=document.getElementById('reservationReminderItems');
   if(!banner||!box)return;
-  const now=new Date(),dateKey=currentPersianDateKey(),nowMinutes=now.getHours()*60+now.getMinutes();
+  const clock=currentTehranClock(),dateKey=clock.dateKey,nowMinutes=clock.minutes;
   const upcoming=reservations.map(r=>({r,minutesLeft:(timeToMinutes(r.time)??-9999)-nowMinutes}))
     .filter(x=>x.r.dateKey===dateKey&&x.r.time&&x.minutesLeft>=0&&x.minutesLeft<=15)
     .sort((a,b)=>a.minutesLeft-b.minutesLeft);
