@@ -13,7 +13,7 @@
     .app{max-width:1240px;margin:auto;padding:16px 12px 70px}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;background:rgba(255,253,249,.94);backdrop-filter:blur(13px);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);margin-bottom:14px}
     .brand{display:flex;align-items:center;gap:11px}.logo{width:46px;height:46px;border:1.5px solid var(--accent);border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-weight:bold}.brand h1{font:700 20px Georgia,serif;letter-spacing:3px;margin:0}.brand small{display:block;color:var(--muted);margin-top:3px}.actions,.row-actions,.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .btn{border:0;border-radius:13px;padding:9px 13px;background:var(--accent);color:#fff;box-shadow:0 7px 16px rgba(123,82,61,.15)}.btn.secondary{background:var(--soft);color:var(--ink);box-shadow:none;border:1px solid var(--line)}.btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1px dashed var(--accent2)}.btn.success{background:var(--success)}.btn.warning{background:var(--warning)}.btn.danger{background:var(--danger)}.btn.info{background:var(--info)}.btn.small{padding:6px 9px;font-size:12px;border-radius:10px}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .nav{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}.nav button{border:1px solid var(--line);background:var(--paper);padding:11px;border-radius:14px;color:var(--ink);font-weight:bold}.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}.view{display:none}.view.active{display:block}
+    .nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}.nav button{border:1px solid var(--line);background:var(--paper);padding:11px;border-radius:14px;color:var(--ink);font-weight:bold}.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}.view{display:none}.view.active{display:block}
     .panel,.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.panel{padding:16px}.panel h3{margin:0 0 13px}.hero{text-align:center;padding:30px 18px;margin-bottom:14px}.hero h2{font:700 27px Georgia,serif;letter-spacing:5px;margin:6px}.hero p{color:var(--muted)}
     .layout-2{display:grid;grid-template-columns:1.5fr .85fr;gap:14px;align-items:start}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.form-grid.three{grid-template-columns:repeat(3,1fr)}label{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:0}input:focus,select:focus,textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(182,146,114,.15)}
     .chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:12px 0}.chip{border:1px solid var(--line);background:#fff;padding:7px 11px;border-radius:999px;color:var(--ink)}.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -55,6 +55,7 @@
     <button data-view="barista">باریستا</button>
     <button data-view="profiles">پروفایل‌ها</button>
     <button data-view="reservations">رزرو / Reservation</button>
+    <button data-view="tables">میزها</button>
     <button data-view="manager">مدیریت</button>
   </nav>
 
@@ -238,9 +239,11 @@
         <div class="detail-head"><h3>مدیریت محصولات</h3><button class="btn danger small" id="resetOrders">پاک‌کردن همه سفارش‌ها</button></div>
         <div class="table-wrap manager-table section-gap"><table><thead><tr><th>نام فارسی</th><th>نام انگلیسی</th><th>دسته</th><th>تک/دبل</th><th>قیمت عادی/تک</th><th>قیمت دبل</th><th>موجود</th><th>عملیات</th></tr></thead><tbody id="productsTable"></tbody></table></div>
       </div>
+    </section>
 
-      <div class="panel section-gap">
-        <div class="detail-head"><div><h3 style="margin-bottom:3px">میزهای در دسترس</h3><span class="muted">وضعیت لحظه‌ای میزهای سالن را ببین؛ قرمز پر، سبز خالی، زرد رزروشده. روی هر میز بزن تا جزئیاتش رو ببینی.</span></div><button class="btn secondary small" id="toggleTableMap">بستن نقشه میزها</button></div>
+    <section id="view-tables" class="view staff-only">
+      <div class="panel">
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">میزهای در دسترس</h3><span class="muted">وضعیت لحظه‌ای میزهای سالن را ببین؛ قرمز پر، سبز خالی، زرد رزروشده. روی هر میز بزن تا جزئیاتش رو ببینی.</span></div></div>
         <div class="table-map-wrap" id="tableMapWrap">
           <div class="table-map" id="tableMap"></div>
           <div class="table-legend">
@@ -795,7 +798,6 @@ document.getElementById('exportOrders').addEventListener('click',exportCSV);
 document.getElementById('resetOrders').addEventListener('click',resetOrders);
 document.getElementById('refreshOrders').addEventListener('click',async()=>{await loadCloud();toast('اطلاعات تازه شد.')});
 document.getElementById('copyMenuLink').addEventListener('click',async()=>{const url=location.href.split('#')[0]+'#public-menu';try{await navigator.clipboard.writeText(url);toast('لینک منوی مشتری کپی شد.')}catch{prompt('این لینک را کپی کن:',url)}});
-document.getElementById('toggleTableMap').addEventListener('click',()=>{const wrap=document.getElementById('tableMapWrap');wrap.classList.toggle('hidden');document.getElementById('toggleTableMap').textContent=wrap.classList.contains('hidden')?'نمایش نقشه میزها':'بستن نقشه میزها';renderTableMap()});
 let publicNoticeConfirmed=false;
 let selectedPublicTable=null;
 function enterPublicMenu(tableNum){
@@ -820,7 +822,7 @@ document.getElementById('enterMenuBtn').addEventListener('click',()=>enterPublic
 
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null});
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
-function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(publicNoticeConfirmed?'view-menu':'view-notice').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
+function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(publicNoticeConfirmed?'view-menu':'view-notice').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','tables','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
 updateArea();initReservationForm();updateReservationVipProfile();renderAll();applyHash();startRealtime();startReservationReminder();startExpiredReservationCleanup();
 </script>
