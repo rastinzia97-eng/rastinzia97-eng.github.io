@@ -29,9 +29,10 @@
     .toast{position:fixed;left:16px;bottom:16px;background:var(--ink);color:#fff;padding:11px 14px;border-radius:12px;opacity:0;transform:translateY(18px);pointer-events:none;transition:.25s;z-index:60;max-width:330px}.toast.show{opacity:1;transform:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
     .public-mode .staff-only,.public-mode .nav,.public-mode .actions{display:none!important}.public-mode .topbar{justify-content:center}.public-mode #view-notice.active{display:block!important}.public-mode #view-menu.active{display:block!important}
     .notice-wrap{text-align:center;padding:34px 20px;margin-bottom:14px}.notice-wrap h2{font:700 26px Georgia,serif;letter-spacing:4px;margin:4px 0 16px}.notice-hello{font-weight:800;font-size:16px;margin-bottom:6px}.notice-text{color:var(--muted);line-height:2;max-width:520px;margin:0 auto 20px}
-    .notice-tables{margin:18px auto 22px;max-width:520px}.notice-tables h4{margin:0 0 10px;font-size:14px;color:var(--ink)}.table-chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.table-chip{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:999px;font-size:13px;font-weight:bold;color:var(--ink)}.table-chip.vip{background:#fff4d9;border-color:#d5a34b;color:#76511b}
+    .notice-tables{margin:18px auto 22px;max-width:520px}.notice-tables h4{margin:0 0 10px;font-size:14px;color:var(--ink)}.table-chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.table-chip{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:999px;font-size:13px;font-weight:bold;color:var(--ink);transition:.15s}.table-chip:active{transform:scale(.95)}.table-chip.vip{background:#fff4d9;border-color:#d5a34b;color:#76511b}.table-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}.table-chip.vip.selected{background:#b3811f;border-color:#b3811f;color:#fff}
+    .picked-table-badge{display:none;margin:0 auto 10px;max-width:fit-content;padding:7px 14px;border-radius:999px;background:var(--soft);color:var(--accent);font-weight:bold;font-size:13px}.picked-table-badge.show{display:block}
     .table-map-wrap{margin-top:14px}.table-map{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,92px);gap:10px;padding:16px;border:2px dashed var(--line);border-radius:16px;background:#fbf6ef}
-    .table-node{border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;box-shadow:var(--shadow);font-size:13px;text-align:center;padding:6px}
+    .table-node{border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;box-shadow:var(--shadow);font-size:13px;text-align:center;padding:6px;cursor:pointer;transition:.15s}.table-node:active{transform:scale(.95)}
     .table-node.free{background:var(--success)}.table-node.occupied{background:var(--danger)}.table-node.reserved{background:var(--warning)}.table-node.vip{outline:3px solid #d5a34b;outline-offset:-3px}
     .tv-node{grid-column:1/3;grid-row:2;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:13px}
     .t1{grid-column:1;grid-row:1}.t2{grid-column:3;grid-row:1}.t3{grid-column:3;grid-row:2}.t4{grid-column:1;grid-row:3}.t5{grid-column:2;grid-row:3}.t6{grid-column:3;grid-row:3}
@@ -75,22 +76,22 @@
         <div class="notice-hello">مشتری گرامی،</div>
         <p class="notice-text">RAEE CAFE در حال تعمیر و بازسازی است. در صورت تأیید این شرایط، لطفاً وارد منوی زیر شوید.</p>
         <div class="notice-tables">
-          <h4>میزهای در دسترس برای نشستن</h4>
-          <div class="table-chip-row">
-            <span class="table-chip">میز ۱</span>
-            <span class="table-chip">میز ۲</span>
-            <span class="table-chip">میز ۳</span>
-            <span class="table-chip">میز ۴</span>
-            <span class="table-chip">میز ۵</span>
-            <span class="table-chip vip">میز ۶ — VIP</span>
+          <h4>میزهای در دسترس برای نشستن — روی میز خودت بزن و وارد منو شو</h4>
+          <div class="table-chip-row" id="noticeTableRow">
+            <button type="button" class="table-chip" data-table="1">میز ۱</button>
+            <button type="button" class="table-chip" data-table="2">میز ۲</button>
+            <button type="button" class="table-chip" data-table="3">میز ۳</button>
+            <button type="button" class="table-chip" data-table="4">میز ۴</button>
+            <button type="button" class="table-chip" data-table="5">میز ۵</button>
+            <button type="button" class="table-chip vip" data-table="6">میز ۶ — VIP</button>
           </div>
         </div>
-        <button class="btn" id="enterMenuBtn">ورود به منو</button>
+        <button class="btn" id="enterMenuBtn">ورود به منو (بدون انتخاب میز)</button>
       </div>
     </section>
 
     <section id="view-menu" class="view active">
-      <div class="panel hero"><div style="font-size:30px">☕</div><h2>RAEE CAFE</h2><p>لحظه‌ای گرم، طعمی ماندگار</p><div class="chips" id="menuFilters"></div></div>
+      <div class="panel hero"><div style="font-size:30px">☕</div><h2>RAEE CAFE</h2><div class="picked-table-badge" id="pickedTableBadge"></div><p>لحظه‌ای گرم، طعمی ماندگار</p><div class="chips" id="menuFilters"></div></div>
       <div class="grid" id="menuGrid"></div>
     </section>
 
@@ -239,8 +240,8 @@
       </div>
 
       <div class="panel section-gap">
-        <div class="detail-head"><div><h3 style="margin-bottom:3px">میزهای در دسترس</h3><span class="muted">وضعیت لحظه‌ای میزهای سالن را ببین؛ قرمز پر، سبز خالی، زرد رزروشده.</span></div><button class="btn secondary small" id="toggleTableMap">نمایش نقشه میزها</button></div>
-        <div class="table-map-wrap hidden" id="tableMapWrap">
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">میزهای در دسترس</h3><span class="muted">وضعیت لحظه‌ای میزهای سالن را ببین؛ قرمز پر، سبز خالی، زرد رزروشده. روی هر میز بزن تا جزئیاتش رو ببینی.</span></div><button class="btn secondary small" id="toggleTableMap">بستن نقشه میزها</button></div>
+        <div class="table-map-wrap" id="tableMapWrap">
           <div class="table-map" id="tableMap"></div>
           <div class="table-legend">
             <span><i class="legend-dot free"></i> خالی</span>
@@ -752,7 +753,20 @@ const TABLE_LABELS={1:'میز ۱',2:'میز ۲',3:'میز ۳',4:'میز ۴',5:'�
 function renderTableMap(){
   const box=document.getElementById('tableMap');
   if(!box)return;
-  box.innerHTML=[1,2,3,4,5,6].map(n=>`<div class="table-node t${n} ${tableStatus(n)}${n===6?' vip':''}"><span>${TABLE_LABELS[n]}</span></div>`).join('')+'<div class="tv-node">📺 تلویزیون</div>';
+  box.innerHTML=[1,2,3,4,5,6].map(n=>{const st=tableStatus(n);return `<div class="table-node t${n} ${st}${n===6?' vip':''}" onclick="showTableDetail(${n})"><span>${TABLE_LABELS[n]}</span></div>`}).join('')+'<div class="tv-node">📺 تلویزیون</div>';
+}
+function showTableDetail(n){
+  const st=tableStatus(n),label=TABLE_LABELS[n];
+  if(st==='occupied'){
+    const o=orders.find(x=>x.area==='hall'&&String(x.table||'').trim()===String(n)&&x.status!=='delivered');
+    toast(`${label} پر است${o?' • '+orderProfileLabel(o)+' • '+(STATUS[o.status]||o.status):''}`);
+  }else if(st==='reserved'){
+    const clock=currentTehranClock();
+    const r=reservations.find(x=>String(x.table)===String(n)&&x.dateKey===clock.dateKey);
+    toast(`${label} رزرو شده${r?' • '+reservationGuestLabel(r)+' • '+reservationTimeLabel(r.time):''}`);
+  }else{
+    toast(`${label} خالی است.`);
+  }
 }
 
 function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder();renderTableMap()}
@@ -783,7 +797,26 @@ document.getElementById('refreshOrders').addEventListener('click',async()=>{awai
 document.getElementById('copyMenuLink').addEventListener('click',async()=>{const url=location.href.split('#')[0]+'#public-menu';try{await navigator.clipboard.writeText(url);toast('لینک منوی مشتری کپی شد.')}catch{prompt('این لینک را کپی کن:',url)}});
 document.getElementById('toggleTableMap').addEventListener('click',()=>{const wrap=document.getElementById('tableMapWrap');wrap.classList.toggle('hidden');document.getElementById('toggleTableMap').textContent=wrap.classList.contains('hidden')?'نمایش نقشه میزها':'بستن نقشه میزها';renderTableMap()});
 let publicNoticeConfirmed=false;
-document.getElementById('enterMenuBtn').addEventListener('click',()=>{publicNoticeConfirmed=true;document.getElementById('view-notice').classList.remove('active');document.getElementById('view-menu').classList.add('active')});
+let selectedPublicTable=null;
+function enterPublicMenu(tableNum){
+  if(tableNum){
+    selectedPublicTable=tableNum;
+    const badge=document.getElementById('pickedTableBadge');
+    badge.textContent=`میز شما: ${tableNum===6?'میز ۶ — VIP':'میز '+tableNum}`;
+    badge.classList.add('show');
+  }
+  publicNoticeConfirmed=true;
+  document.getElementById('view-notice').classList.remove('active');
+  document.getElementById('view-menu').classList.add('active');
+}
+document.getElementById('noticeTableRow').addEventListener('click',e=>{
+  const btn=e.target.closest('.table-chip');
+  if(!btn)return;
+  document.querySelectorAll('#noticeTableRow .table-chip').forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  enterPublicMenu(btn.dataset.table);
+});
+document.getElementById('enterMenuBtn').addEventListener('click',()=>enterPublicMenu(null));
 
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null});
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
