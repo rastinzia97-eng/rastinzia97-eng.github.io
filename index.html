@@ -27,7 +27,16 @@
     .detail{margin-top:13px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.reservation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.reservation-date-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.reservation-card{padding:13px}.reservation-card h4{margin:0 0 5px}.reservation-meta{line-height:1.9;color:var(--muted);font-size:13px}.reservation-slot{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:12px;margin-top:6px}.reservation-reminder{display:none;margin-bottom:14px;padding:13px 15px;border:1px solid #d5a34b;border-radius:16px;background:#fff4d9;box-shadow:var(--shadow);color:#76511b}.reservation-reminder.show{display:block}.reservation-reminder-title{font-weight:800;margin-bottom:6px}.reservation-reminder-item{line-height:1.9}.reservation-reminder-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.reservation-reminder-item+.reservation-reminder-item{border-top:1px dashed rgba(118,81,27,.28);margin-top:9px;padding-top:9px}.debt-reminder{display:none;margin-bottom:14px;padding:13px 15px;border:1px solid #c96b6b;border-radius:16px;background:#fff0f0;box-shadow:var(--shadow);color:#7d3434}.debt-reminder.show{display:block}.debt-reminder-title{font-weight:800;margin-bottom:6px}.debt-reminder-item{display:flex;justify-content:space-between;align-items:center;gap:12px;line-height:1.9}.debt-reminder-item+.debt-reminder-item{border-top:1px dashed rgba(125,52,52,.25);margin-top:9px;padding-top:9px}.debt-reminder-info{flex:1}.debt-actions{display:flex;gap:7px;flex-wrap:wrap}.debt-high{border-color:#d57b7b!important;box-shadow:0 0 0 3px rgba(166,77,77,.08)}select option:disabled{color:#999;background:#eee}.transfer-order{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.transfer-order select{min-width:0}.hidden{display:none!important}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{border-collapse:collapse;width:100%;min-width:850px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;vertical-align:top}th{background:#f5eadf;position:sticky;top:0}tr:last-child td{border-bottom:0}.manager-table input,.manager-table select{min-width:115px}.manager-table .wide-input{min-width:150px}.toggle{display:inline-flex;gap:6px;align-items:center}.toggle input{width:auto}.manager-tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;align-items:end}.manager-tools .wide{grid-column:span 2}.section-gap{margin-top:14px}.sync{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--muted)}.sync:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warning)}.sync.online:before{background:var(--success)}.sync.offline:before{background:var(--danger)}
     .toast{position:fixed;left:16px;bottom:16px;background:var(--ink);color:#fff;padding:11px 14px;border-radius:12px;opacity:0;transform:translateY(18px);pointer-events:none;transition:.25s;z-index:60;max-width:330px}.toast.show{opacity:1;transform:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
-    .public-mode .staff-only,.public-mode .nav,.public-mode .actions{display:none!important}.public-mode .topbar{justify-content:center}.public-mode #view-menu{display:block!important}
+    .public-mode .staff-only,.public-mode .nav,.public-mode .actions{display:none!important}.public-mode .topbar{justify-content:center}.public-mode #view-notice.active{display:block!important}.public-mode #view-menu.active{display:block!important}
+    .notice-wrap{text-align:center;padding:34px 20px;margin-bottom:14px}.notice-wrap h2{font:700 26px Georgia,serif;letter-spacing:4px;margin:4px 0 16px}.notice-hello{font-weight:800;font-size:16px;margin-bottom:6px}.notice-text{color:var(--muted);line-height:2;max-width:520px;margin:0 auto 20px}
+    .notice-tables{margin:18px auto 22px;max-width:520px}.notice-tables h4{margin:0 0 10px;font-size:14px;color:var(--ink)}.table-chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.table-chip{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:999px;font-size:13px;font-weight:bold;color:var(--ink)}.table-chip.vip{background:#fff4d9;border-color:#d5a34b;color:#76511b}
+    .table-map-wrap{margin-top:14px}.table-map{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,92px);gap:10px;padding:16px;border:2px dashed var(--line);border-radius:16px;background:#fbf6ef}
+    .table-node{border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;box-shadow:var(--shadow);font-size:13px;text-align:center;padding:6px}
+    .table-node.free{background:var(--success)}.table-node.occupied{background:var(--danger)}.table-node.reserved{background:var(--warning)}.table-node.vip{outline:3px solid #d5a34b;outline-offset:-3px}
+    .tv-node{grid-column:1/3;grid-row:2;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:13px}
+    .t1{grid-column:1;grid-row:1}.t2{grid-column:3;grid-row:1}.t3{grid-column:3;grid-row:2}.t4{grid-column:1;grid-row:3}.t5{grid-column:2;grid-row:3}.t6{grid-column:3;grid-row:3}
+    .table-legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)}.table-legend span{display:inline-flex;align-items:center;gap:5px}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.legend-dot.free{background:var(--success)}.legend-dot.occupied{background:var(--danger)}.legend-dot.reserved{background:var(--warning)}
+    @media(max-width:620px){.table-map{grid-template-rows:repeat(3,74px)}}
     @media(max-width:950px){.layout-2{grid-template-columns:1fr}.kanban{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.manager-tools{grid-template-columns:repeat(2,1fr)}.manager-tools .wide{grid-column:1/-1}.grid,.profile-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:620px){.app{padding:9px 8px 60px}.topbar{padding:10px}.brand h1{font-size:17px;letter-spacing:2px}.logo{width:41px;height:41px}.nav{grid-template-columns:repeat(2,1fr)}.grid,.profile-grid,.product-picker,.form-grid,.form-grid.three,.manager-tools,.transfer-order,.reservation-grid,.reservation-date-grid{grid-template-columns:1fr}.debt-reminder-item{align-items:flex-start;flex-direction:column}.manager-tools .wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.actions{gap:5px}.topbar .actions .btn{display:none}}
   </style>
@@ -59,6 +68,27 @@
   </div>
 
   <main>
+    <section id="view-notice" class="view">
+      <div class="panel notice-wrap">
+        <div style="font-size:30px">☕</div>
+        <h2>RAEE CAFE</h2>
+        <div class="notice-hello">مشتری گرامی،</div>
+        <p class="notice-text">RAEE CAFE در حال تعمیر و بازسازی است. در صورت تأیید این شرایط، لطفاً وارد منوی زیر شوید.</p>
+        <div class="notice-tables">
+          <h4>میزهای در دسترس برای نشستن</h4>
+          <div class="table-chip-row">
+            <span class="table-chip">میز ۱</span>
+            <span class="table-chip">میز ۲</span>
+            <span class="table-chip">میز ۳</span>
+            <span class="table-chip">میز ۴</span>
+            <span class="table-chip">میز ۵</span>
+            <span class="table-chip vip">میز ۶ — VIP</span>
+          </div>
+        </div>
+        <button class="btn" id="enterMenuBtn">ورود به منو</button>
+      </div>
+    </section>
+
     <section id="view-menu" class="view active">
       <div class="panel hero"><div style="font-size:30px">☕</div><h2>RAEE CAFE</h2><p>لحظه‌ای گرم، طعمی ماندگار</p><div class="chips" id="menuFilters"></div></div>
       <div class="grid" id="menuGrid"></div>
@@ -206,6 +236,19 @@
       <div class="panel section-gap">
         <div class="detail-head"><h3>مدیریت محصولات</h3><button class="btn danger small" id="resetOrders">پاک‌کردن همه سفارش‌ها</button></div>
         <div class="table-wrap manager-table section-gap"><table><thead><tr><th>نام فارسی</th><th>نام انگلیسی</th><th>دسته</th><th>تک/دبل</th><th>قیمت عادی/تک</th><th>قیمت دبل</th><th>موجود</th><th>عملیات</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+      </div>
+
+      <div class="panel section-gap">
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">میزهای در دسترس</h3><span class="muted">وضعیت لحظه‌ای میزهای سالن را ببین؛ قرمز پر، سبز خالی، زرد رزروشده.</span></div><button class="btn secondary small" id="toggleTableMap">نمایش نقشه میزها</button></div>
+        <div class="table-map-wrap hidden" id="tableMapWrap">
+          <div class="table-map" id="tableMap"></div>
+          <div class="table-legend">
+            <span><i class="legend-dot free"></i> خالی</span>
+            <span><i class="legend-dot occupied"></i> پر</span>
+            <span><i class="legend-dot reserved"></i> رزروشده</span>
+            <span>میز ۶ با کادر طلایی = VIP</span>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -692,7 +735,27 @@ async function addProduct(){const fa=document.getElementById('newFa').value.trim
 function exportCSV(){const rows=[['کد سفارش','پروفایل','نام','نام خانوادگی','شماره تماس','نوع سفارش','میز','زمان','وضعیت سفارش','وضعیت پرداخت','محصولات','یادداشت','جمع']];for(const o of orders){const p=profileById(o.profileId);rows.push([o.id,orderProfileLabel(o),p?.firstName||o.profileFirstName||'',p?.lastName||o.profileLastName||'',p?.phone||o.profilePhone||'',AREAS[o.area]||'',o.table||'',nowFa(o.createdAt),STATUS[o.status]||o.status,paymentOf(o)==='paid'?'پرداخت‌شده':'پرداخت‌نشده',(o.items||[]).map(i=>`${i.qty}×${i.name}`).join(' | '),o.note||'',totalOf(o)])}const csv='\uFEFF'+rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='raee-orders.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 async function resetOrders(){if(!confirm('همه سفارش‌ها، حتی سابقه پرداخت‌شده، پاک شوند؟'))return;try{await dbRequest('orders','DELETE');orders=[];renderAll();toast('همه سفارش‌ها پاک شدند.')}catch{toast('پاک‌کردن سفارش‌ها انجام نشد.')}}
 
-function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder()}
+function tableStatus(n){
+  const occupied=orders.some(o=>o.area==='hall'&&String(o.table||'').trim()===String(n)&&o.status!=='delivered');
+  if(occupied)return 'occupied';
+  const clock=currentTehranClock();
+  const reserved=reservations.some(r=>{
+    if(String(r.table)!==String(n)||r.dateKey!==clock.dateKey)return false;
+    const start=timeToMinutes(r.time);
+    if(start==null)return false;
+    const end=r.endTime?timeToMinutes(r.endTime):start+90;
+    return clock.minutes>=start-15&&clock.minutes<=end;
+  });
+  return reserved?'reserved':'free';
+}
+const TABLE_LABELS={1:'میز ۱',2:'میز ۲',3:'میز ۳',4:'میز ۴',5:'میز ۵',6:'میز ۶ VIP'};
+function renderTableMap(){
+  const box=document.getElementById('tableMap');
+  if(!box)return;
+  box.innerHTML=[1,2,3,4,5,6].map(n=>`<div class="table-node t${n} ${tableStatus(n)}${n===6?' vip':''}"><span>${TABLE_LABELS[n]}</span></div>`).join('')+'<div class="tv-node">📺 تلویزیون</div>';
+}
+
+function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder();renderTableMap()}
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));location.hash=name}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.getElementById('orderArea').addEventListener('change',updateArea);
@@ -718,10 +781,13 @@ document.getElementById('exportOrders').addEventListener('click',exportCSV);
 document.getElementById('resetOrders').addEventListener('click',resetOrders);
 document.getElementById('refreshOrders').addEventListener('click',async()=>{await loadCloud();toast('اطلاعات تازه شد.')});
 document.getElementById('copyMenuLink').addEventListener('click',async()=>{const url=location.href.split('#')[0]+'#public-menu';try{await navigator.clipboard.writeText(url);toast('لینک منوی مشتری کپی شد.')}catch{prompt('این لینک را کپی کن:',url)}});
+document.getElementById('toggleTableMap').addEventListener('click',()=>{const wrap=document.getElementById('tableMapWrap');wrap.classList.toggle('hidden');document.getElementById('toggleTableMap').textContent=wrap.classList.contains('hidden')?'نمایش نقشه میزها':'بستن نقشه میزها';renderTableMap()});
+let publicNoticeConfirmed=false;
+document.getElementById('enterMenuBtn').addEventListener('click',()=>{publicNoticeConfirmed=true;document.getElementById('view-notice').classList.remove('active');document.getElementById('view-menu').classList.add('active')});
 
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null});
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
-function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-menu').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
+function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(publicNoticeConfirmed?'view-menu':'view-notice').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
 updateArea();initReservationForm();updateReservationVipProfile();renderAll();applyHash();startRealtime();startReservationReminder();startExpiredReservationCleanup();
 </script>
