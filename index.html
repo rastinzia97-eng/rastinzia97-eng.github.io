@@ -408,6 +408,8 @@ async function loadCloud(silent=false){if(cloudBusy)return;cloudBusy=true;try{
   orders=(data.orders?Object.values(data.orders).filter(Boolean):[]).map(migrateOrder).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   profiles=(data.profiles?Object.values(data.profiles).filter(Boolean):[]).sort((a,b)=>(a.number||0)-(b.number||0));
   reservations=(data.reservations?Object.values(data.reservations).filter(Boolean):[]).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+  alerts=data.alerts?Object.values(data.alerts).filter(Boolean):[];
+  tableManualStatus=data.tableStatus?{1:'free',2:'free',3:'free',4:'free',5:'free',6:'free',...data.tableStatus}:tableManualStatus;
   setTimeout(cleanupExpiredReservations,0);
   if(added||!data.products)await dbRequest('products','PUT',objById(products));
   if(Number(data.appDataVersion)!==APP_DATA_VERSION)await dbRequest('appDataVersion','PUT',APP_DATA_VERSION);
@@ -761,19 +763,22 @@ function renderTableMap(){
   if(!box)return;
   box.innerHTML=[1,2,3,4,5,6].map(n=>{const st=tableStatus(n);return `<div class="table-node t${n} ${st}${n===6?' vip':''}" onclick="toggleTableStatus(${n})"><span>${TABLE_LABELS[n]}</span></div>`}).join('')+'<div class="tv-node">📺 تلویزیون</div>';
 }
-function toggleTableStatus(n){
+async function toggleTableStatus(n){
   const label=TABLE_LABELS[n];
-  if(tableStatus(n)==='occupied'){
-    if(!confirm(`آیا مطمئن هستید که می‌خواهید ${label} خالی شود؟`))return;
-    tableManualStatus[n]='free';
-    toast(`${label} خالی شد.`);
-  }else{
-    if(!confirm(`آیا مطمئن هستید که می‌خواهید ${label} پر شود؟`))return;
-    tableManualStatus[n]='occupied';
-    toast(`${label} پر شد.`);
-  }
-  saveLocal();
+  const next=tableStatus(n)==='occupied'?'free':'occupied';
+  const msg=next==='free'?`آیا مطمئن هستید که می‌خواهید ${label} خالی شود؟`:`آیا مطمئن هستید که می‌خواهید ${label} پر شود؟`;
+  if(!confirm(msg))return;
+  const old=tableManualStatus[n];
+  tableManualStatus[n]=next;
   renderTableMap();
+  try{
+    await dbRequest('tableStatus/'+n,'PUT',next);
+    saveLocal();
+    toast(next==='free'?`${label} خالی شد.`:`${label} پر شد.`);
+  }catch{
+    tableManualStatus[n]=old;renderTableMap();
+    toast('تغییر وضعیت میز ذخیره نشد؛ اتصال را بررسی کن.');
+  }
 }
 
 function renderMenuAlerts(){
@@ -791,31 +796,53 @@ function renderAlertsAdmin(){
   if(!alerts.length){box.innerHTML='<p class="muted">هشداری ثبت نشده.</p>';return;}
   box.innerHTML=alerts.map(a=>`<div class="alert-admin-row"><span>${esc(a.text)}</span><div class="alert-admin-actions"><button class="btn secondary small" onclick="editAlert('${a.id}')">ویرایش</button><button class="btn danger small" onclick="deleteAlert('${a.id}')">حذف</button></div></div>`).join('');
 }
-function addAlert(){
+async function addAlert(){
   const input=document.getElementById('newAlertText');
   const text=input.value.trim();
   if(!text){toast('متن هشدار را بنویس.');return}
-  alerts.push({id:'a_'+Date.now()+Math.random().toString(36).slice(2,7),text});
-  input.value='';
-  saveLocal();renderAll();
-  toast('هشدار اضافه شد.');
+  const a={id:'a_'+Date.now()+Math.random().toString(36).slice(2,7),text};
+  try{
+    await dbRequest('alerts/'+a.id,'PUT',a);
+    alerts.push(a);
+    input.value='';
+    saveLocal();renderAll();
+    toast('هشدار اضافه شد و بالای منوی مشتری نمایش داده می‌شود.');
+  }catch{
+    toast('افزودن هشدار ذخیره نشد؛ اتصال را بررسی کن.');
+  }
 }
-function editAlert(id){
+async function editAlert(id){
   const a=alerts.find(x=>x.id===id);
   if(!a)return;
   const t=prompt('ویرایش متن هشدار:',a.text);
   if(t===null)return;
   const trimmed=t.trim();
   if(!trimmed){toast('متن هشدار نمی‌تواند خالی باشد.');return}
+  const old=a.text;
   a.text=trimmed;
-  saveLocal();renderAll();
-  toast('هشدار ویرایش شد.');
+  renderAll();
+  try{
+    await dbRequest('alerts/'+id,'PATCH',{text:trimmed});
+    saveLocal();
+    toast('هشدار ویرایش شد.');
+  }catch{
+    a.text=old;renderAll();
+    toast('ویرایش هشدار ذخیره نشد؛ اتصال را بررسی کن.');
+  }
 }
-function deleteAlert(id){
+async function deleteAlert(id){
   if(!confirm('آیا مطمئن هستید که می‌خواهید این هشدار حذف شود؟'))return;
+  const old=alerts;
   alerts=alerts.filter(x=>x.id!==id);
-  saveLocal();renderAll();
-  toast('هشدار حذف شد.');
+  renderAll();
+  try{
+    await dbRequest('alerts/'+id,'DELETE');
+    saveLocal();
+    toast('هشدار حذف شد.');
+  }catch{
+    alerts=old;renderAll();
+    toast('حذف هشدار ذخیره نشد؛ اتصال را بررسی کن.');
+  }
 }
 
 function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder();renderTableMap();renderMenuAlerts();renderAlertsAdmin()}
