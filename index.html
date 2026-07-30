@@ -38,6 +38,9 @@
     .t1{grid-column:1;grid-row:1}.t2{grid-column:3;grid-row:1}.t3{grid-column:3;grid-row:2}.t4{grid-column:1;grid-row:3}.t5{grid-column:2;grid-row:3}.t6{grid-column:3;grid-row:3}
     .table-legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)}.table-legend span{display:inline-flex;align-items:center;gap:5px}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.legend-dot.free{background:var(--success)}.legend-dot.occupied{background:var(--danger)}
     @media(max-width:620px){.table-map{grid-template-rows:repeat(3,74px)}}
+    .alert-add-row{display:flex;gap:8px}.alert-add-row input{flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+    .alert-admin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:8px;background:#fff}.alert-admin-row span{flex:1;font-size:14px}.alert-admin-actions{display:flex;gap:6px;flex-shrink:0}
+    .alert-banner{display:none}.alert-banner.show{display:block;margin-bottom:12px}.alert-item-banner{background:#fff4d9;border:1px solid #d5a34b;color:#76511b;padding:12px 16px;border-radius:14px;font-weight:bold;text-align:center;margin-bottom:8px;display:flex;align-items:center;gap:8px;justify-content:center;line-height:1.8}
     @media(max-width:950px){.layout-2{grid-template-columns:1fr}.kanban{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.manager-tools{grid-template-columns:repeat(2,1fr)}.manager-tools .wide{grid-column:1/-1}.grid,.profile-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:620px){.app{padding:9px 8px 60px}.topbar{padding:10px}.brand h1{font-size:17px;letter-spacing:2px}.logo{width:41px;height:41px}.nav{grid-template-columns:repeat(2,1fr)}.grid,.profile-grid,.product-picker,.form-grid,.form-grid.three,.manager-tools,.transfer-order,.reservation-grid,.reservation-date-grid{grid-template-columns:1fr}.debt-reminder-item{align-items:flex-start;flex-direction:column}.manager-tools .wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.actions{gap:5px}.topbar .actions .btn{display:none}}
   </style>
@@ -92,6 +95,7 @@
     </section>
 
     <section id="view-menu" class="view active">
+      <div class="alert-banner" id="menuAlertBanner"></div>
       <div class="panel hero"><div style="font-size:30px">☕</div><h2>RAEE CAFE</h2><div class="picked-table-badge" id="pickedTableBadge"></div><p>لحظه‌ای گرم، طعمی ماندگار</p><div class="chips" id="menuFilters"></div></div>
       <div class="grid" id="menuGrid"></div>
     </section>
@@ -239,6 +243,15 @@
         <div class="detail-head"><h3>مدیریت محصولات</h3><button class="btn danger small" id="resetOrders">پاک‌کردن همه سفارش‌ها</button></div>
         <div class="table-wrap manager-table section-gap"><table><thead><tr><th>نام فارسی</th><th>نام انگلیسی</th><th>دسته</th><th>تک/دبل</th><th>قیمت عادی/تک</th><th>قیمت دبل</th><th>موجود</th><th>عملیات</th></tr></thead><tbody id="productsTable"></tbody></table></div>
       </div>
+
+      <div class="panel section-gap">
+        <div class="detail-head"><div><h3 style="margin-bottom:3px">هشدارها</h3><span class="muted">هرچی اینجا اضافه کنی بالای منوی مشتری نشون داده می‌شه.</span></div></div>
+        <div class="alert-add-row section-gap">
+          <input id="newAlertText" placeholder="متن هشدار را بنویس...">
+          <button class="btn small" id="addAlertBtn">افزودن هشدار</button>
+        </div>
+        <div id="alertsAdminList" class="section-gap"></div>
+      </div>
     </section>
 
     <section id="view-tables" class="view staff-only">
@@ -323,12 +336,13 @@ let orders=loadLocal('raee_orders',[]);
 let profiles=loadLocal('raee_profiles',[]);
 let reservations=loadLocal('raee_reservations',[]);
 let tableManualStatus=loadLocal('raee_table_status',{1:'free',2:'free',3:'free',4:'free',5:'free',6:'free'});
+let alerts=loadLocal('raee_alerts',[]);
 let cart={},menuCat='all',waiterCat='all',selectedProfileId=null,managerPaymentFilter='all',pollTimer=null,cloudBusy=false;
 let transferSelections={};
 
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function loadLocal(k,f){try{const v=JSON.parse(localStorage.getItem(k));return v??clone(f)}catch{return clone(f)}}
-function saveLocal(){localStorage.setItem('raee_products',JSON.stringify(products));localStorage.setItem('raee_orders',JSON.stringify(orders));localStorage.setItem('raee_profiles',JSON.stringify(profiles));localStorage.setItem('raee_reservations',JSON.stringify(reservations));localStorage.setItem('raee_table_status',JSON.stringify(tableManualStatus))}
+function saveLocal(){localStorage.setItem('raee_products',JSON.stringify(products));localStorage.setItem('raee_orders',JSON.stringify(orders));localStorage.setItem('raee_profiles',JSON.stringify(profiles));localStorage.setItem('raee_reservations',JSON.stringify(reservations));localStorage.setItem('raee_table_status',JSON.stringify(tableManualStatus));localStorage.setItem('raee_alerts',JSON.stringify(alerts))}
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 function money(v){return new Intl.NumberFormat('fa-IR').format(Number(v)||0)+' تومان'}
 function nowFa(ts=Date.now()){return new Intl.DateTimeFormat('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}
@@ -761,7 +775,47 @@ function toggleTableStatus(n){
   renderTableMap();
 }
 
-function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder();renderTableMap()}
+function renderMenuAlerts(){
+  const box=document.getElementById('menuAlertBanner');
+  if(!box)return;
+  if(!alerts.length){box.classList.remove('show');box.innerHTML='';return;}
+  box.innerHTML=alerts.map(a=>`<div class="alert-item-banner">⚠️ ${esc(a.text)}</div>`).join('');
+  box.classList.add('show');
+}
+function renderAlertsAdmin(){
+  const box=document.getElementById('alertsAdminList');
+  if(!box)return;
+  if(!alerts.length){box.innerHTML='<p class="muted">هشداری ثبت نشده.</p>';return;}
+  box.innerHTML=alerts.map(a=>`<div class="alert-admin-row"><span>${esc(a.text)}</span><div class="alert-admin-actions"><button class="btn secondary small" onclick="editAlert('${a.id}')">ویرایش</button><button class="btn danger small" onclick="deleteAlert('${a.id}')">حذف</button></div></div>`).join('');
+}
+function addAlert(){
+  const input=document.getElementById('newAlertText');
+  const text=input.value.trim();
+  if(!text){toast('متن هشدار را بنویس.');return}
+  alerts.push({id:'a_'+Date.now()+Math.random().toString(36).slice(2,7),text});
+  input.value='';
+  saveLocal();renderAll();
+  toast('هشدار اضافه شد.');
+}
+function editAlert(id){
+  const a=alerts.find(x=>x.id===id);
+  if(!a)return;
+  const t=prompt('ویرایش متن هشدار:',a.text);
+  if(t===null)return;
+  const trimmed=t.trim();
+  if(!trimmed){toast('متن هشدار نمی‌تواند خالی باشد.');return}
+  a.text=trimmed;
+  saveLocal();renderAll();
+  toast('هشدار ویرایش شد.');
+}
+function deleteAlert(id){
+  if(!confirm('آیا مطمئن هستید که می‌خواهید این هشدار حذف شود؟'))return;
+  alerts=alerts.filter(x=>x.id!==id);
+  saveLocal();renderAll();
+  toast('هشدار حذف شد.');
+}
+
+function renderAll(){saveLocal();renderMenu();renderPicker();renderCart();renderOrders();renderProfiles();renderReservations();renderManager();renderReservationReminder();renderDebtReminder();renderTableMap();renderMenuAlerts();renderAlertsAdmin()}
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));location.hash=name}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.getElementById('orderArea').addEventListener('change',updateArea);
@@ -808,6 +862,8 @@ document.getElementById('noticeTableRow').addEventListener('click',e=>{
   enterPublicMenu(btn.dataset.table);
 });
 document.getElementById('enterMenuBtn').addEventListener('click',()=>enterPublicMenu(null));
+document.getElementById('addAlertBtn').addEventListener('click',addAlert);
+document.getElementById('newAlertText').addEventListener('keydown',e=>{if(e.key==='Enter')addAlert()});
 
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null});
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js');
