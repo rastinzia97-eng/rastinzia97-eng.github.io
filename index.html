@@ -74,6 +74,7 @@
 
   <main>
     <section id="view-notice" class="view">
+      <div class="alert-banner" id="noticeAlertBanner"></div>
       <div class="panel notice-wrap">
         <div style="font-size:30px">☕</div>
         <h2>RAEE CAFE</h2>
@@ -776,11 +777,13 @@ function toggleTableStatus(n){
 }
 
 function renderMenuAlerts(){
-  const box=document.getElementById('menuAlertBanner');
-  if(!box)return;
-  if(!alerts.length){box.classList.remove('show');box.innerHTML='';return;}
-  box.innerHTML=alerts.map(a=>`<div class="alert-item-banner">⚠️ ${esc(a.text)}</div>`).join('');
-  box.classList.add('show');
+  const html=alerts.length?alerts.map(a=>`<div class="alert-item-banner">⚠️ ${esc(a.text)}</div>`).join(''):'';
+  [['menuAlertBanner'],['noticeAlertBanner']].forEach(([id])=>{
+    const box=document.getElementById(id);
+    if(!box)return;
+    box.innerHTML=html;
+    box.classList.toggle('show',!!alerts.length);
+  });
 }
 function renderAlertsAdmin(){
   const box=document.getElementById('alertsAdminList');
