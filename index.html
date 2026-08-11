@@ -900,6 +900,342 @@ if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWor
 function applyHash(){if(location.hash==='#public-menu'){document.body.classList.add('public-mode');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(publicNoticeConfirmed?'view-menu':'view-notice').classList.add('active')}else{document.body.classList.remove('public-mode');const name=location.hash.replace('#','');if(['menu','waiter','barista','profiles','reservations','tables','manager'].includes(name))showView(name)}}
 window.addEventListener('hashchange',()=>{if(location.hash==='#public-menu')applyHash()});
 updateArea();initReservationForm();updateReservationVipProfile();renderAll();applyHash();startRealtime();startReservationReminder();startExpiredReservationCleanup();
+</script><style>
+@media print{
+  .invoice-print-button{display:none!important}
+}
+.invoice-print-button{
+  margin-top:8px;
+}
+</style>
+
+<script>
+(function(){
+
+  function getOrderId(card){
+    const text=card.innerText||'';
+    const match=text.match(/\bR[A-Z0-9]{5,}\b/);
+    return match ? match[0] : null;
+  }
+
+  function addInvoiceButtons(){
+    document.querySelectorAll('.order-card').forEach(card=>{
+      if(card.dataset.invoiceButtonAdded==='1') return;
+
+      const id=getOrderId(card);
+      if(!id) return;
+
+      const actions=card.querySelector('.row-actions');
+      if(!actions) return;
+
+      const btn=document.createElement('button');
+      btn.className='btn info small invoice-print-button';
+      btn.type='button';
+      btn.textContent='🖨 چاپ فاکتور';
+      btn.onclick=()=>window.printRaeeInvoice(id);
+
+      actions.appendChild(btn);
+      card.dataset.invoiceButtonAdded='1';
+    });
+  }
+
+  window.printRaeeInvoice=function(id){
+
+    const order=orders.find(o=>o.id===id);
+
+    if(!order){
+      alert('سفارش پیدا نشد.');
+      return;
+    }
+
+    const profile=typeof profileById==='function'
+      ? profileById(order.profileId)
+      : null;
+
+    const customer=profile
+      ? `${profile.firstName||''} ${profile.lastName||''}`.trim()
+      : (order.customer||'مشتری');
+
+    const phone=profile?.phone || order.profilePhone || '—';
+
+    const area=typeof orderLocation==='function'
+      ? orderLocation(order)
+      : (order.table ? 'میز '+order.table : 'داخل سالن');
+
+    const total=typeof totalOf==='function'
+      ? totalOf(order)
+      : (order.items||[]).reduce(
+          (s,i)=>s+(Number(i.price)||0)*(Number(i.qty)||0),0
+        );
+
+    const items=(order.items||[]).map(i=>`
+      <tr>
+        <td>${i.name||'—'}</td>
+        <td>${i.qty||0}</td>
+        <td>${new Intl.NumberFormat('fa-IR').format(Number(i.price)||0)} تومان</td>
+        <td>${new Intl.NumberFormat('fa-IR').format((Number(i.price)||0)*(Number(i.qty)||0))} تومان</td>
+      </tr>
+    `).join('');
+
+    const payment=order.paymentStatus==='paid'
+      ? 'پرداخت‌شده'
+      : 'پرداخت‌نشده';
+
+    const date=typeof nowFa==='function'
+      ? nowFa(order.createdAt)
+      : new Date(order.createdAt||Date.now()).toLocaleString('fa-IR');
+
+    const win=window.open('','_blank','width=900,height=900');
+
+    if(!win){
+      alert('لطفاً اجازه باز شدن پنجره جدید را فعال کن.');
+      return;
+    }
+
+    win.document.write(`
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فاکتور ${order.id}</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#eee;
+  font-family:Tahoma,Arial,sans-serif;
+  color:#3f3028;
+}
+
+.invoice{
+  width:210mm;
+  min-height:297mm;
+  margin:20px auto;
+  padding:18mm;
+  background:#fff;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:2px solid #7b523d;
+  padding-bottom:15px;
+  margin-bottom:18px;
+}
+
+.logo{
+  font-family:Georgia,serif;
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:4px;
+}
+
+.title{
+  text-align:left;
+}
+
+.title h1{
+  margin:0 0 6px;
+  font-size:23px;
+}
+
+.muted{
+  color:#777;
+  font-size:12px;
+}
+
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:20px;
+}
+
+.info div{
+  padding:10px;
+  background:#faf6f1;
+  border:1px solid #e1d4c8;
+  border-radius:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid #ddd;
+  text-align:right;
+}
+
+th{
+  background:#f2e6dc;
+}
+
+.total{
+  margin-top:20px;
+  padding:14px;
+  background:#f2e6dc;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.note{
+  margin-top:18px;
+  padding:12px;
+  border:1px dashed #cdbbaa;
+  border-radius:8px;
+}
+
+.print-btn{
+  display:block;
+  margin:20px auto;
+  padding:12px 30px;
+  border:0;
+  border-radius:9px;
+  background:#7b523d;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.footer{
+  text-align:center;
+  margin-top:35px;
+  color:#777;
+  font-size:12px;
+}
+
+@media print{
+  body{background:#fff}
+  .invoice{
+    margin:0;
+    width:210mm;
+    min-height:297mm;
+    padding:12mm;
+  }
+
+  .print-btn{
+    display:none;
+  }
+}
+
+@page{
+  size:A4;
+  margin:0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="invoice">
+
+  <div class="header">
+    <div>
+      <div class="logo">RAEE CAFE</div>
+      <div class="muted">سیستم سفارش و فاکتور</div>
+    </div>
+
+    <div class="title">
+      <h1>فاکتور فروش</h1>
+      <div class="muted">شماره سفارش: ${order.id}</div>
+      <div class="muted">${date}</div>
+    </div>
+  </div>
+
+  <div class="info">
+
+    <div>
+      <b>مشتری</b><br>
+      ${customer}
+    </div>
+
+    <div>
+      <b>شماره تماس</b><br>
+      ${phone}
+    </div>
+
+    <div>
+      <b>محل سفارش</b><br>
+      ${area}
+    </div>
+
+    <div>
+      <b>وضعیت پرداخت</b><br>
+      ${payment}
+    </div>
+
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>محصول</th>
+        <th>تعداد</th>
+        <th>قیمت واحد</th>
+        <th>مبلغ</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${items}
+    </tbody>
+  </table>
+
+  <div class="total">
+    <span>مبلغ نهایی</span>
+    <span>
+      ${new Intl.NumberFormat('fa-IR').format(total)} تومان
+    </span>
+  </div>
+
+  ${
+    order.note
+    ? `<div class="note"><b>یادداشت سفارش:</b><br>${order.note}</div>`
+    : ''
+  }
+
+  <button class="print-btn" onclick="window.print()">
+    🖨 چاپ فاکتور
+  </button>
+
+  <div class="footer">
+    RAEE CAFE ☕<br>
+    از خرید شما سپاسگزاریم
+  </div>
+
+</div>
+
+</body>
+</html>
+    `);
+
+    win.document.close();
+    win.focus();
+  };
+
+  const observer=new MutationObserver(addInvoiceButtons);
+
+  observer.observe(document.body,{
+    childList:true,
+    subtree:true
+  });
+
+  setTimeout(addInvoiceButtons,500);
+  setTimeout(addInvoiceButtons,1500);
+  setTimeout(addInvoiceButtons,3000);
+
+})();
 </script>
 </body>
 </html>
